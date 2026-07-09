@@ -94,19 +94,21 @@ export default function SearchModal({ isOpen, onClose, onSelectCalculator }: Sea
             >
               {/* Input field */}
               <div className="flex items-center px-4.5 py-4 border-b border-zinc-100" id="search-input-wrapper">
-                <Search className="w-5 h-5 text-zinc-400 mr-3.5 shrink-0" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search mathematical calculators (e.g., percentages, mortgage, discounts)..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full bg-transparent border-0 text-sm font-sans text-zinc-950 placeholder-zinc-400 focus:outline-none focus:ring-0 py-0.5"
-                  id="search-input-el"
-                />
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Search mathematical calculators (e.g., percentages, mortgage, discounts)..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="w-full bg-transparent border-0 text-sm font-sans text-zinc-950 placeholder-zinc-400 focus:outline-none focus:ring-0 py-0.5 pl-10 pr-3"
+                    id="search-input-el"
+                  />
+                </div>
                 <button
                   onClick={onClose}
-                  className="p-1.5 hover:bg-zinc-100/80 rounded-sm text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer focus:outline-none"
+                  className="ml-3 p-1.5 hover:bg-zinc-100/80 rounded-sm text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer focus:outline-none"
                   id="search-close-btn"
                 >
                   <X className="w-4 h-4" />

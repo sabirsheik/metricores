@@ -15,13 +15,13 @@ export default function Footer({ onChangeTab }: FooterProps) {
         <div className="md:col-span-4 space-y-4" id="footer-branding">
           <button
             onClick={() => onChangeTab('home')}
-            className="flex items-center space-x-2.5 text-zinc-900 font-heading font-bold text-base tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
+            className="flex items-center text-zinc-900 font-heading font-bold text-base tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
             id="footer-brand-logo"
           >
-            <span className="w-5.5 h-5.5 rounded-sm bg-zinc-950 flex items-center justify-center text-white text-[11px] font-mono font-bold tracking-tighter">
+            <span className="inline-flex w-8 h-8 rounded-xl bg-zinc-950 items-center justify-center text-white text-sm font-mono font-bold tracking-tighter shadow-sm">
               M
             </span>
-            <span className="font-semibold text-zinc-900">Metricores</span>
+            <span className="font-semibold text-zinc-900 ml-3">Metricores</span>
           </button>
           <p className="text-xs text-zinc-500 font-sans leading-relaxed max-w-sm">
             Metricores delivers enterprise-grade business calculators designed for elite pricing accuracy, personal tax estimation, and commercial real estate projections. Simple, fast, and completely free.

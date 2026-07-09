@@ -98,21 +98,23 @@ export default function Header({
       className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200 transition-colors duration-200"
       id="site-header"
     >
-      <div className="max-w-[95%] w-[95%] mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between" id="header-container">
+      <div className="relative max-w-[95%] w-[95%] mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between" id="header-container">
         {/* Left Side: Brand Logo */}
         <button
           onClick={() => handleTabClick('home')}
-          className="flex items-center space-x-2.5 text-zinc-900 font-heading font-bold text-base md:text-lg tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
+          className="flex items-center text-zinc-900 font-heading font-bold text-base md:text-lg tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
           id="brand-logo"
         >
-          <span className="w-5.5 h-5.5 rounded-sm bg-zinc-950 flex items-center justify-center text-white text-[11px] font-mono font-bold tracking-tighter">
+          <span className="inline-flex w-8 h-8 rounded-xl bg-zinc-950 items-center justify-center text-white text-sm font-mono font-bold tracking-tighter shadow-sm">
             M
           </span>
-          <span className="font-semibold tracking-tight text-zinc-900 text-sm md:text-base">Metricores</span>
+          <span className="font-semibold tracking-tight text-zinc-900 text-sm md:text-base ml-3">
+            Metricores
+          </span>
         </button>
 
         {/* Center: Desktop Nav Link bar */}
-        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 h-full" id="desktop-nav">
+        <nav className="hidden md:flex items-center space-x-6 lg:space-x-8 h-full absolute left-1/2 top-0 bottom-0 -translate-x-1/2" id="desktop-nav">
           {/* Calculators Dropdown Menu */}
           <div
             className="relative flex items-center h-full"
