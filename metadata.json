@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: Metricores",
+  "description": "A premium, lightweight, and professional business calculator platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

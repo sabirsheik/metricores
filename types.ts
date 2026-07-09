@@ -1,0 +1,74 @@
+export type CalculatorId =
+  | 'scientific'
+  | 'graphing'
+  | 'mortgage'
+  | 'loan'
+  | 'tax'
+  | 'interest'
+  | 'payment'
+  | 'time'
+  | 'profit-margin'
+  | 'roi'
+  | 'percentage'
+  | 'discount'
+  | 'tip'
+  | 'vat';
+
+export interface InputField {
+  id: string;
+  label: string;
+  type: 'number' | 'select' | 'date' | 'boolean';
+  defaultValue: any;
+  min?: number;
+  max?: number;
+  step?: number;
+  prefix?: string;
+  suffix?: string;
+  placeholder?: string;
+  options?: { label: string; value: string }[];
+  tooltip?: string;
+}
+
+export interface ResultField {
+  id: string;
+  label: string;
+  value: string | number;
+  isPrimary?: boolean;
+  prefix?: string;
+  suffix?: string;
+  format?: 'currency' | 'percent' | 'number' | 'text' | 'date';
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface CalculatorSchema {
+  id: CalculatorId;
+  name: string;
+  shortDescription: string;
+  category: 'Financial Mathematics' | 'Practical Mathematics' | 'Basic Mathematics';
+  lastUpdated: string;
+  inputs: InputField[];
+  formula: {
+    equation: string;
+    description: string;
+    steps: string[];
+  };
+  example: {
+    scenario: string;
+    explanation: string;
+  };
+  faqs: FAQItem[];
+}
+
+export interface GuideArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  readTime: string;
+  publishedDate: string;
+}
