@@ -45,15 +45,16 @@ export default function CookieConsent({
   return (
     <AnimatePresence>
       {showBanner && (
+        <div className="fixed inset-x-0 bottom-6 z-50 flex justify-center px-4 md:px-6" id="cookie-consent-banner-shell">
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 40, scale: 0.98 }}
           transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] md:w-[95%] max-w-5xl bg-white/95 backdrop-blur-md border border-zinc-200/60 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12)] rounded-3xl p-5 md:p-6 z-50 font-sans"
+          className="w-full max-w-4xl bg-white/95 backdrop-blur-md border border-zinc-200/60 shadow-[0_24px_50px_-12px_rgba(0,0,0,0.12)] rounded-3xl p-5 md:p-6 font-sans"
           id="cookie-consent-banner"
         >
-          <div className="flex flex-col md:flex-row items-start gap-4 md:gap-5" id="cookie-banner-wrapper">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-5" id="cookie-banner-wrapper">
             {/* Left Icon Badge */}
             <div 
               className="bg-zinc-950 text-white p-3 rounded-2xl shrink-0 flex items-center justify-center w-11 h-11 md:w-12 md:h-12 border border-zinc-800/50 shadow-xs" 
@@ -81,9 +82,9 @@ export default function CookieConsent({
                 </p>
               </div>
 
-              {/* Actions row: Aligned right on desktop, left on mobile */}
+              {/* Actions row: Aligned center */}
               <div 
-                className="flex flex-wrap items-center gap-2.5 justify-start sm:justify-end" 
+                className="flex flex-wrap items-center gap-2.5 justify-center" 
                 id="cookie-banner-actions"
               >
                 <button
@@ -113,6 +114,7 @@ export default function CookieConsent({
             </div>
           </div>
         </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );
