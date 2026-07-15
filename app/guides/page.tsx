@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import GuidesClient from "./guides-client";
 
 export const metadata: Metadata = {
@@ -8,6 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function GuidesPage() {
-  return <GuidesClient />;
+  return (
+    <Suspense>
+      <GuidesClient />
+    </Suspense>
+  );
 }
 
