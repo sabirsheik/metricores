@@ -9,5 +9,5 @@ export default function CalculatorsClient() {
   const handleSelectCalculator = (id: string) => {
     router.push(`/calculators/${id}`);
   };
-  return <CalculatorsDirectory onNavigateToCalculator={handleSelectCalculator} />;
+  return <CalculatorsDirectory onSelectCalculator={handleSelectCalculator} />;
 }
