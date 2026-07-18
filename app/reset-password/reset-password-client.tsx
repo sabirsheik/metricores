@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, Mail } from 'lucide-react';
+import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
 
 const resetPasswordSchema = z
@@ -25,21 +26,18 @@ interface ResetPasswordClientProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
+type ResetPasswordStatus = 'loading' | 'form' | 'success' | 'invalid-token' | 'expired' | 'error';
+
 export default function ResetPasswordClient({ searchParams }: ResetPasswordClientProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [status, setStatus] = useState<ResetPasswordStatus>('loading');
+  const [isResending, setIsResending] = useState(false);
   const router = useRouter();
 
   const token = Array.isArray(searchParams.token)
     ? searchParams.token[0]
     : searchParams.token;
-
-  useEffect(() => {
-    if (!token) {
-      router.push('/auth');
-    }
-  }, [token, router]);
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -48,6 +46,15 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
       confirmPassword: '',
     },
   });
+
+  useEffect(() => {
+    if (!token) {
+      toast.error('Invalid reset link');
+      setStatus('invalid-token');
+      return;
+    }
+    setStatus('form');
+  }, [token, router]);
 
   const handleSubmit = async (values: ResetPasswordFormValues) => {
     if (!token) return;
@@ -61,53 +68,299 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
       });
 
       const data = await res.json();
+      
       if (!res.ok) {
+        if (res.status === 400 && data.error?.includes('expired')) {
+          setStatus('expired');
+          toast.error('Reset link has expired');
+          return;
+        }
         toast.error(data.error || 'Something went wrong');
+        setStatus('error');
         return;
       }
 
-      setIsSuccess(true);
+      setStatus('success');
       toast.success('Password reset successfully!');
       setTimeout(() => {
         router.push('/auth');
-      }, 2000);
+      }, 3000);
     } catch (error) {
+      console.error('Password reset error:', error);
       toast.error('Something went wrong');
+      setStatus('error');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isSuccess) {
+  const handleRequestNewLink = async () => {
+    setIsResending(true);
+    try {
+      // User would need to enter email to request new link
+      router.push('/forgot-password');
+    } catch (error) {
+      toast.error('Failed to redirect');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  // Loading state
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50/30 px-4 py-12">
         <div className="w-full max-w-md text-center">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-sm bg-zinc-950 flex items-center justify-center">
-              <span className="text-white text-sm font-bold font-mono">M</span>
-            </div>
+          <div className="inline-flex items-center justify-center mb-4">
+            <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-2">
-            Password reset!
+            Validating reset link...
           </h1>
-          <p className="text-sm text-zinc-500 font-sans mb-8">
-            Redirecting you to sign in...
+          <p className="text-sm text-zinc-500 font-sans">
+            Please wait while we verify your reset link
           </p>
         </div>
       </div>
     );
   }
 
-  if (!token) {
-    return null;
+  // Invalid token state
+  if (status === 'invalid-token') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50/50 to-zinc-50/30 px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <div className="w-14 h-14 rounded-lg bg-red-50 flex items-center justify-center border border-red-200/50">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-3">
+              Invalid Reset Link
+            </h1>
+            <p className="text-base text-zinc-600 font-sans mb-2">
+              This password reset link is not valid.
+            </p>
+            <p className="text-sm text-zinc-500 font-sans mb-8">
+              Please request a new password reset link to proceed.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="space-y-3"
+          >
+            <a
+              href="/forgot-password"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Request New Reset Link
+              <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="/auth"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Back to Sign In
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    );
   }
 
+  // Expired token state
+  if (status === 'expired') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50/50 to-zinc-50/30 px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <div className="w-14 h-14 rounded-lg bg-amber-50 flex items-center justify-center border border-amber-200/50">
+              <AlertCircle className="w-8 h-8 text-amber-600" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-3">
+              Reset Link Expired
+            </h1>
+            <p className="text-base text-zinc-600 font-sans mb-2">
+              Your password reset link has expired.
+            </p>
+            <p className="text-sm text-zinc-500 font-sans mb-8">
+              Reset links are valid for 1 hour. Please request a new one to continue.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="space-y-3"
+          >
+            <a
+              href="/forgot-password"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Request New Reset Link
+              <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="/auth"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Back to Sign In
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state
+  if (status === 'success') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50/50 to-zinc-50/30 px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <div className="w-14 h-14 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-200/50">
+              <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-3">
+              Password Reset Successfully!
+            </h1>
+            <p className="text-base text-zinc-600 font-sans mb-2">
+              Your password has been changed.
+            </p>
+            <p className="text-sm text-zinc-500 font-sans mb-8">
+              You can now sign in with your new password.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <a
+              href="/auth"
+              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg text-sm transition-all shadow-sm hover:shadow-md"
+            >
+              Continue to Sign In
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ scaleX: 1 }}
+            animate={{ scaleX: 0 }}
+            transition={{ duration: 3, ease: 'linear' }}
+            className="absolute bottom-0 left-0 h-1 bg-emerald-500"
+            style={{ transformOrigin: 'left', width: '100%' }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (status === 'error') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50/50 to-zinc-50/30 px-4 py-12">
+        <div className="w-full max-w-md text-center">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="inline-flex items-center gap-2 mb-8"
+          >
+            <div className="w-14 h-14 rounded-lg bg-red-50 flex items-center justify-center border border-red-200/50">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-3">
+              Password Reset Failed
+            </h1>
+            <p className="text-base text-zinc-600 font-sans mb-2">
+              Something went wrong during password reset.
+            </p>
+            <p className="text-sm text-zinc-500 font-sans mb-8">
+              Please try again or request a new reset link.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="space-y-3"
+          >
+            <button
+              onClick={() => setStatus('form')}
+              className="w-full bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Try Again
+            </button>
+            <a
+              href="/forgot-password"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-semibold py-2.5 px-4 rounded-lg text-sm transition-all"
+            >
+              Request New Link
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // Form state
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50/30 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-sm bg-zinc-950 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-zinc-950 flex items-center justify-center">
               <span className="text-white text-sm font-bold font-mono">M</span>
             </div>
           </div>
@@ -115,11 +368,11 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
             Reset password
           </h1>
           <p className="text-sm text-zinc-500 font-sans">
-            Enter your new password
+            Enter your new password to regain access
           </p>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-sm p-8 shadow-2xs">
+        <div className="bg-white border border-zinc-200 rounded-lg p-8 shadow-sm">
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
             <div>
               <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
@@ -131,7 +384,7 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
                   type={showPassword ? 'text' : 'password'}
                   {...form.register('password')}
                   className={cn(
-                    'w-full pl-9 pr-9 py-1.5 bg-white border rounded-sm text-xs font-mono focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all',
+                    'w-full pl-9 pr-9 py-1.5 bg-white border rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all',
                     form.formState.errors.password
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                       : 'border-zinc-200'
@@ -163,7 +416,7 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
                   type={showPassword ? 'text' : 'password'}
                   {...form.register('confirmPassword')}
                   className={cn(
-                    'w-full pl-9 pr-3 py-1.5 bg-white border rounded-sm text-xs font-mono focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all',
+                    'w-full pl-9 pr-3 py-1.5 bg-white border rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all',
                     form.formState.errors.confirmPassword
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                       : 'border-zinc-200'
@@ -181,12 +434,21 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-sm text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-lg text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Reset password'}
               {!isLoading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-xs text-zinc-500 font-sans">
+              Know your password?{' '}
+              <a href="/auth" className="text-zinc-950 hover:text-zinc-800 font-bold transition-colors">
+                Sign in
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

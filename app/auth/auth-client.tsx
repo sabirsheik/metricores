@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowRight, AlertCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
 
 const signUpSchema = z
@@ -43,6 +44,8 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const { data: session, status } = useSession();
   const router = useRouter();
+  const clientSearchParams = useSearchParams();
+  const verificationToastShownRef = useRef(false);
 
   const signUpForm = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -65,16 +68,25 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
   useEffect(() => {
     if (session) {
       router.push('/profile');
+      return;
     }
 
-    const error = Array.isArray(searchParams.error)
-      ? searchParams.error[0]
-      : searchParams.error;
+    const getParam = (key: string) => {
+      const clientValue = clientSearchParams?.get(key);
+      if (clientValue !== null) {
+        return clientValue;
+      }
 
+      const serverValue = searchParams[key];
+      if (Array.isArray(serverValue)) {
+        return serverValue[0];
+      }
+      return serverValue;
+    };
+
+    const error = getParam('error');
     if (error === 'EmailNotVerified') {
-      const email = Array.isArray(searchParams.email)
-        ? searchParams.email[0]
-        : searchParams.email;
+      const email = getParam('email');
       setUnverifiedEmail(email || '');
     } else if (error === 'invalid-token') {
       toast.error('Invalid or expired verification link');
@@ -82,14 +94,16 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
       toast.error('Something went wrong during verification');
     }
 
-    const verified = Array.isArray(searchParams.verified)
-      ? searchParams.verified[0]
-      : searchParams.verified;
+    const verified = getParam('verified');
+    if (verified === 'true' && !verificationToastShownRef.current) {
+      verificationToastShownRef.current = true;
+      toast.success('Email verified successfully! Ready to sign in.');
 
-    if (verified === 'true') {
-      toast.success('Email verified successfully! Please sign in.');
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete('verified');
+      router.replace(`${currentUrl.pathname}${currentUrl.search}`);
     }
-  }, [session, router, searchParams]);
+  }, [session, router, clientSearchParams, searchParams]);
 
   // Now handle early returns
   if (status === 'loading') {
