@@ -10,17 +10,32 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowRight, AlertCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
+import { validatePassword } from '@/utils/password';
 
 const signUpSchema = z
   .object({
     fullName: z.string().min(2, 'Full name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string(),
     confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
+  .superRefine((data, ctx) => {
+    const validation = validatePassword(data.password);
+    if (!validation.isValid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: validation.message,
+        path: ['password'],
+      });
+    }
+
+    if (data.password && data.confirmPassword && data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      });
+    }
   });
 
 const signInSchema = z.object({
@@ -56,6 +71,13 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
       confirmPassword: '',
     },
   });
+
+  const passwordValue = signUpForm.watch('password');
+  const confirmPasswordValue = signUpForm.watch('confirmPassword');
+  const passwordValidation = validatePassword(passwordValue || '');
+  const showPasswordRequirements = Boolean(passwordValue);
+  const submitDisabled =
+    isLoading || !passwordValidation.isValid || !confirmPasswordValue || passwordValue !== confirmPasswordValue;
 
   const signInForm = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -119,6 +141,18 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
   }
 
   const handleSignUp = async (values: SignUpFormValues) => {
+    if (!passwordValidation.isValid) {
+      signUpForm.setError('password', { type: 'manual', message: passwordValidation.message });
+      toast.error(passwordValidation.message);
+      return;
+    }
+
+    if (!confirmPasswordValue || passwordValue !== confirmPasswordValue) {
+      signUpForm.setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' });
+      toast.error('Passwords do not match');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch('/api/auth/signup', {
@@ -399,6 +433,46 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
                     {signUpForm.formState.errors.password.message}
                   </p>
                 )}
+
+                {showPasswordRequirements && (
+                  <div className="mt-2 space-y-2 rounded-sm border border-zinc-200 bg-zinc-50 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-semibold text-zinc-600">
+                        Strength: {passwordValidation.strength}
+                      </span>
+                      <span className={cn('text-[11px] font-medium', passwordValidation.isValid ? 'text-emerald-600' : 'text-zinc-500')}>
+                        {passwordValidation.message}
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
+                      <div
+                        className={cn('h-full transition-all',
+                          passwordValidation.strength === 'Weak' ? 'w-1/3 bg-red-500' :
+                          passwordValidation.strength === 'Medium' ? 'w-2/3 bg-amber-500' : 'w-full bg-emerald-500')}
+                      />
+                    </div>
+                    <div className="grid gap-1.5 text-[11px] text-zinc-600">
+                      {[
+                        ['At least 6 characters', passwordValidation.requirements.length],
+                        ['1 uppercase letter', passwordValidation.requirements.uppercase],
+                        ['1 lowercase letter', passwordValidation.requirements.lowercase],
+                        ['1 number', passwordValidation.requirements.number],
+                        ['1 special character', passwordValidation.requirements.special],
+                        ['Avoid common passwords', passwordValidation.requirements.common],
+                        ['Avoid repeated characters', passwordValidation.requirements.repeated],
+                        ['Avoid sequential patterns', passwordValidation.requirements.sequential],
+                      ].map(([label, met]) => {
+                        const requirementLabel = label as string;
+                        return (
+                          <div key={requirementLabel} className="flex items-center gap-2">
+                            <span className={cn('h-2.5 w-2.5 rounded-full', met ? 'bg-emerald-500' : 'bg-zinc-300')} />
+                            <span className={met ? 'text-emerald-700' : 'text-zinc-600'}>{requirementLabel}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -430,7 +504,7 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={submitDisabled}
                 className="w-full bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-2.5 px-4 rounded-sm text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create account'}

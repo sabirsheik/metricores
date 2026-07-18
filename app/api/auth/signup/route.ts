@@ -4,6 +4,7 @@ import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { generateSecureToken, hashToken } from '@/lib/token';
 import { sendVerificationEmail } from '@/lib/email';
+import { validatePassword } from '@/utils/password';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,14 @@ export async function POST(request: NextRequest) {
     if (!fullName || !email || !password) {
       return NextResponse.json(
         { error: 'All fields are required' },
+        { status: 400 }
+      );
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return NextResponse.json(
+        { error: passwordValidation.message },
         { status: 400 }
       );
     }

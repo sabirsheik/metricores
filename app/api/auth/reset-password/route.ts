@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { hashToken } from '@/lib/token';
+import { validatePassword } from '@/utils/password';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Token and password are required' }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 });
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
     }
 
     await dbConnect();
