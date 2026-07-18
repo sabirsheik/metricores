@@ -35,9 +35,9 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
   const [isResending, setIsResending] = useState(false);
   const router = useRouter();
 
-  const token = Array.isArray(searchParams.token)
-    ? searchParams.token[0]
-    : searchParams.token;
+  const [token, setToken] = useState<string | undefined>(
+    Array.isArray(searchParams.token) ? searchParams.token[0] : searchParams.token
+  );
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -48,13 +48,24 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
   });
 
   useEffect(() => {
+    if (!token && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlToken = params.get('token');
+
+      if (urlToken) {
+        setToken(urlToken);
+        return;
+      }
+    }
+
     if (!token) {
       toast.error('Invalid reset link');
       setStatus('invalid-token');
       return;
     }
+
     setStatus('form');
-  }, [token, router]);
+  }, [token]);
 
   const handleSubmit = async (values: ResetPasswordFormValues) => {
     if (!token) return;
@@ -278,7 +289,7 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
           >
             <a
               href="/auth"
-              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-lg text-sm transition-all shadow-sm hover:shadow-md"
+              className="w-full inline-flex items-center justify-center gap-2 bg-zinc-950 hover:bg-zinc-850 text-white font-semibold py-3 px-4 rounded-lg text-sm transition-all shadow-sm hover:shadow-md"
             >
               Continue to Sign In
               <ArrowRight className="w-4 h-4" />

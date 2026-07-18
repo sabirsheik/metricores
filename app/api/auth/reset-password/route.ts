@@ -29,6 +29,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired reset token' }, { status: 400 });
     }
 
+    const isSamePassword = await bcrypt.compare(password, user.password);
+    if (isSamePassword) {
+      return NextResponse.json({ error: 'New password must be different from your current password' }, { status: 400 });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     user.password = hashedPassword;
