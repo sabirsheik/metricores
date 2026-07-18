@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter, usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
@@ -71,62 +72,74 @@ export default function RootLayoutClient({
     localStorage.setItem("metricores-theme", "light");
   }, []);
 
+  const hideChrome =
+    pathname === "/auth" ||
+    pathname.startsWith("/auth/") ||
+    pathname === "/verify-email" ||
+    pathname.startsWith("/verify-email/") ||
+    pathname === "/reset-password" ||
+    pathname.startsWith("/reset-password/");
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFAFA] text-zinc-900">
-      <SearchModal
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        onSelectCalculator={handleSelectCalculator}
-      />
-      <Header
-        currentTab={
-          pathname === "/" || pathname === "/home"
-            ? "calculators" 
-            : pathname.startsWith("/calculators/") 
-              ? pathname.slice(1).replace("/", "-") 
-              : pathname.slice(1)
-        }
-        onChangeTab={handleTabChange}
-        onOpenSearch={() => setSearchOpen(true)}
-      />
-      <main className="flex-grow">
-        {/* Simplified animation for faster navigation */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.08, ease: "easeOut" }}
-            className="w-full"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
-      </main>
-      <Footer onChangeTab={handleTabChange} />
-      <CookieConsent
-        isOpen={cookieSettingsOpen}
-        onClose={() => setCookieSettingsOpen(false)}
-        onOpenPreferences={() => {
-          router.push("/privacy");
-          setCookieSettingsOpen(true);
-          setTimeout(() => {
-            const element = document.getElementById("cookie-settings-card");
-            if (element) {
-              element.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-              });
+    <SessionProvider>
+      <div className="min-h-screen flex flex-col bg-[#FAFAFA] text-zinc-900">
+        <SearchModal
+          isOpen={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          onSelectCalculator={handleSelectCalculator}
+        />
+        {!hideChrome && (
+          <Header
+            currentTab={
+              pathname === "/" || pathname === "/home"
+                ? "calculators"
+                : pathname.startsWith("/calculators/")
+                  ? pathname.slice(1).replace("/", "-")
+                  : pathname.slice(1)
             }
-          }, 200);
-        }}
-        analyticalCookies={analyticalCookies}
-        marketingCookies={marketingCookies}
-        onAcceptAll={onAcceptAll}
-        onRejectAll={onRejectAll}
-        cookieConsentSaved={cookieConsentSaved}
-      />
-    </div>
+            onChangeTab={handleTabChange}
+            onOpenSearch={() => setSearchOpen(true)}
+          />
+        )}
+        <main className="flex-grow">
+          {/* Simplified animation for faster navigation */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.08, ease: "easeOut" }}
+              className="w-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+        {!hideChrome && <Footer onChangeTab={handleTabChange} />}
+        <CookieConsent
+          isOpen={cookieSettingsOpen}
+          onClose={() => setCookieSettingsOpen(false)}
+          onOpenPreferences={() => {
+            router.push("/privacy");
+            setCookieSettingsOpen(true);
+            setTimeout(() => {
+              const element = document.getElementById("cookie-settings-card");
+              if (element) {
+                element.scrollIntoView({
+                  behavior: "smooth",
+                  block: "center"
+                });
+              }
+            }, 200);
+          }}
+          analyticalCookies={analyticalCookies}
+          marketingCookies={marketingCookies}
+          onAcceptAll={onAcceptAll}
+          onRejectAll={onRejectAll}
+          cookieConsentSaved={cookieConsentSaved}
+        />
+      </div>
+    </SessionProvider>
   );
 }

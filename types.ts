@@ -72,3 +72,31 @@ export interface GuideArticle {
   readTime: string;
   publishedDate: string;
 }
+
+export interface User {
+  _id?: string;
+  fullName: string;
+  username?: string;
+  email: string;
+  profilePicture?: string;
+  provider: 'email' | 'google';
+  password?: string;
+  role: 'user' | 'admin';
+  accountStatus: 'active' | 'inactive' | 'suspended';
+  emailVerified: boolean;
+  lastLogin?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  refreshToken?: string;
+  bio?: string;
+  // Email Verification Fields
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
+  verificationAttempts?: number;
+  lastVerificationSent?: Date;
+  // Password Reset Fields
+  resetPasswordToken?: string;
+  resetPasswordTokenExpires?: Date;
+  resetAttempts?: number;
+  lastResetSent?: Date;
+}

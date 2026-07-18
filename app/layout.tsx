@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AppProvider } from "@/lib/AppContext";
 import { ToastProvider } from "@/components/calculator/Toast";
+import { Toaster } from "sonner";
 import RootLayoutClient from "./layout-client";
 
 export default function RootLayout({
@@ -14,6 +15,7 @@ export default function RootLayout({
         <AppProvider>
           <ToastProvider>
             <RootLayoutClient>{children}</RootLayoutClient>
+            <Toaster />
           </ToastProvider>
         </AppProvider>
       </body>
