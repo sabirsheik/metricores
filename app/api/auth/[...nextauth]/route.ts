@@ -106,9 +106,10 @@ export const authOptions: NextAuthOptions = {
           const existingUser = await User.findOne({ email: profile.email });
           debug('Existing user found:', existingUser ? 'Yes' : 'No');
 
-          if (!existingUser) {
+          let googleUser = existingUser;
+          if (!googleUser) {
             debug('Creating new user');
-            const newUser = await User.create({
+            googleUser = await User.create({
               fullName: profile.name || '',
               email: profile.email,
               profilePicture: profile.image,
@@ -116,15 +117,16 @@ export const authOptions: NextAuthOptions = {
               emailVerified: true,
               lastLogin: new Date(),
             });
-            debug('New user created with createdAt:', newUser.createdAt, 'lastLogin:', newUser.lastLogin);
+            debug('New user created with createdAt:', googleUser.createdAt, 'lastLogin:', googleUser.lastLogin);
           } else {
             debug('Updating existing user');
-            existingUser.lastLogin = new Date();
-            existingUser.profilePicture = profile.image || existingUser.profilePicture;
-            existingUser.fullName = profile.name || existingUser.fullName;
-            await existingUser.save();
-            debug('User updated with lastLogin:', existingUser.lastLogin);
+            googleUser.lastLogin = new Date();
+            googleUser.profilePicture = profile.image || googleUser.profilePicture;
+            googleUser.fullName = profile.name || googleUser.fullName;
+            await googleUser.save();
+            debug('User updated with lastLogin:', googleUser.lastLogin);
           }
+          user.id = googleUser._id.toString();
         } else if (account?.provider === 'credentials') {
           debug('Processing credentials sign-in for:', user.id);
           const existingUser = await User.findById(user.id);
@@ -152,7 +154,11 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session.user && token.sub) {
           await dbConnect();
-          const dbUser = await User.findById(token.sub);
+          const dbUser = /^[0-9a-fA-F]{24}$/.test(token.sub)
+            ? await User.findById(token.sub)
+            : token.email
+              ? await User.findOne({ email: token.email })
+              : null;
           debug('DB User found:', dbUser);
           
           if (dbUser) {

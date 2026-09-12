@@ -106,6 +106,8 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
       return serverValue;
     };
 
+    setIsSignUp(getParam('mode') === 'signup');
+
     const error = getParam('error');
     if (error === 'EmailNotVerified') {
       const email = getParam('email');

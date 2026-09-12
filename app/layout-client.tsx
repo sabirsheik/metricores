@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import SearchModal from "@/components/SearchModal";
 import CookieConsent from "@/components/CookieConsent";
 import { useAppContext } from "@/lib/AppContext";
+import GuestLimitModal from "@/components/GuestLimitModal";
 
 export default function RootLayoutClient({
   children,
@@ -81,8 +82,6 @@ export default function RootLayoutClient({
   }, [pathname]);
 
   const hideChrome =
-    pathname === "/auth" ||
-    pathname.startsWith("/auth/") ||
     pathname === "/verify-email" ||
     pathname.startsWith("/verify-email/") ||
     pathname === "/reset-password" ||
@@ -91,6 +90,7 @@ export default function RootLayoutClient({
   return (
     <SessionProvider>
       <div className="min-h-screen flex flex-col bg-[#FAFAFA] text-zinc-900">
+        <GuestLimitModal />
         <SearchModal
           isOpen={searchOpen}
           onClose={() => setSearchOpen(false)}

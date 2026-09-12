@@ -36,6 +36,7 @@ import {
   LogIn
 } from 'lucide-react';
 import { useSession, signIn } from 'next-auth/react';
+import { useAppContext, GUEST_CALCULATION_LIMIT } from '@/lib/AppContext';
 import { CalculatorSchema, ResultField } from '@/types';
 import { calculate, calculatorsData } from '@/data/calculators';
 import InputField from './InputField';
@@ -81,7 +82,8 @@ export default function CalculatorCard({
 }: CalculatorCardProps) {
   const IconComponent = calcIcons[calculator.id] || Percent;
   const { addToast } = useToast();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+  const { guestCalculationsUsed, guestUsageReady, attemptGuestCalculation, openGuestLimit } = useAppContext();
 
   // Parameters State
   const [inputs, setInputs] = useState<Record<string, any>>({});
@@ -204,6 +206,18 @@ export default function CalculatorCard({
     setTimeout(() => {
       try {
         const computed = calculate(calculator.id, inputs);
+        const isGuestCalculator = sessionStatus === 'unauthenticated' && calculator.id !== 'scientific';
+        if (isGuestCalculator) {
+          if (!guestUsageReady) {
+            addToast('Preparing guest access. Please try again in a moment.', 'info');
+            return;
+          }
+          if (!attemptGuestCalculation()) {
+            addToast('Your free guest calculations are complete.', 'info');
+            openGuestLimit();
+            return;
+          }
+        }
         setResults(computed);
         if (session?.user && calculator.id !== 'scientific') {
           void fetch('/api/user/workspace', {
@@ -213,6 +227,10 @@ export default function CalculatorCard({
           });
         }
         addToast('Calculation completed successfully!', 'success');
+        if (isGuestCalculator && guestCalculationsUsed + 1 >= GUEST_CALCULATION_LIMIT) {
+          addToast('You have used your 3 free guest calculations.', 'info', 4500);
+          window.setTimeout(openGuestLimit, 350);
+        }
       } catch (err) {
         console.error('Calculation execution failed:', err);
         addToast('Calculation execution failed.', 'error');
@@ -1693,6 +1711,11 @@ export default function CalculatorCard({
           <p className="text-sm text-zinc-600 font-sans leading-relaxed">
             {calculator.shortDescription}
           </p>
+          {sessionStatus === 'unauthenticated' && calculator.id !== 'scientific' && guestUsageReady && (
+            <p className="text-[11px] font-medium text-zinc-400" aria-live="polite">
+              {guestCalculationsUsed} of {GUEST_CALCULATION_LIMIT} free calculations used
+            </p>
+          )}
         </div>
       </div>
 

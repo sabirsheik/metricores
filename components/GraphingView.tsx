@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { MathParser } from '@/utils/mathParser';
 import { useToast } from './calculator/Toast';
+import { useSession } from 'next-auth/react';
+import { useAppContext, GUEST_CALCULATION_LIMIT } from '@/lib/AppContext';
 
 interface EquationItem {
   id: string;
@@ -87,6 +89,8 @@ const MATHE_PRESETS = [
 
 export default function GraphingView() {
   const { addToast } = useToast();
+  const { data: session, status: sessionStatus } = useSession();
+  const { guestCalculationsUsed, guestUsageReady, attemptGuestCalculation, openGuestLimit } = useAppContext();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -112,6 +116,47 @@ export default function GraphingView() {
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [mouseCoord, setMouseCoord] = useState<{ x: number; y: number } | null>(null);
   const [activePresetIndex, setActivePresetIndex] = useState<number>(-1);
+
+  useEffect(() => {
+    if (sessionStatus !== 'authenticated') return;
+    void fetch('/api/user/workspace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'recent', calculatorId: 'graphing' }),
+    });
+  }, [sessionStatus]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem('metricores_restore_calculation');
+      if (!stored) return;
+      const record = JSON.parse(stored);
+      if (record.calculatorId !== 'graphing' || !Array.isArray(record.inputs?.equations)) return;
+
+      const restored = record.inputs.equations
+        .map((equation: unknown, index: number) => {
+          if (typeof equation === 'string') {
+            return { id: `restored-${index}`, expression: equation, color: PRESET_COLORS[index % PRESET_COLORS.length], visible: true };
+          }
+          if (equation && typeof equation === 'object') {
+            const item = equation as Partial<EquationItem>;
+            return {
+              id: item.id || `restored-${index}`,
+              expression: item.expression || '',
+              color: item.color || PRESET_COLORS[index % PRESET_COLORS.length],
+              visible: item.visible !== false,
+            };
+          }
+          return null;
+        })
+        .filter((equation: EquationItem | null): equation is EquationItem => equation !== null);
+
+      if (restored.length > 0) setEquations(restored);
+      window.localStorage.removeItem('metricores_restore_calculation');
+    } catch {
+      window.localStorage.removeItem('metricores_restore_calculation');
+    }
+  }, []);
 
   // Width & height trackers
   const [dimensions, setDimensions] = useState({ width: 600, height: 450 });
@@ -613,8 +658,43 @@ export default function GraphingView() {
     );
   };
 
+  const saveGraphHistory = (items: EquationItem[]) => {
+    const validEquations = items.filter((equation) => equation.expression.trim() && !equation.error);
+    if (!session?.user || validEquations.length === 0) return;
+
+    const expressions = validEquations.map((equation) => equation.expression.trim());
+    void fetch('/api/user/workspace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'history',
+        calculatorId: 'graphing',
+        inputs: { equations: validEquations.map(({ id, expression, color, visible }) => ({ id, expression, color, visible })) },
+        results: [{
+          id: 'graphing-equations',
+          label: 'Equations',
+          value: expressions.join(', '),
+          isPrimary: true,
+          format: 'text',
+        }],
+      }),
+    });
+  };
+
   // Presets
   const handleLoadPreset = (idx: number) => {
+    const isGuest = sessionStatus === 'unauthenticated';
+    if (isGuest) {
+      if (!guestUsageReady) {
+        addToast('Preparing guest access. Please try again in a moment.', 'info');
+        return;
+      }
+      if (!attemptGuestCalculation()) {
+        addToast('Your free guest calculations are complete.', 'info');
+        openGuestLimit();
+        return;
+      }
+    }
     const preset = MATHE_PRESETS[idx];
     const loaded = preset.equations.map((eq, eqIdx) => ({
       id: Math.random().toString(36).substr(2, 9) + eqIdx,
@@ -625,7 +705,12 @@ export default function GraphingView() {
     setEquations(loaded);
     setActivePresetIndex(idx);
     handleResetView();
+    saveGraphHistory(loaded);
     addToast(`Preset "${preset.name}" loaded.`, 'success');
+    if (isGuest && guestCalculationsUsed + 1 >= GUEST_CALCULATION_LIMIT) {
+      addToast('You have used your 3 free guest calculations.', 'info', 4500);
+      window.setTimeout(openGuestLimit, 350);
+    }
   };
 
   const handleClearAll = () => {
@@ -683,6 +768,11 @@ export default function GraphingView() {
           <p className="text-sm text-zinc-600 font-sans leading-relaxed">
             Enter equations like <code className="font-mono bg-zinc-100 text-zinc-800 px-1 py-0.5 rounded text-xs">sin(x)</code> or <code className="font-mono bg-zinc-100 text-zinc-800 px-1 py-0.5 rounded text-xs">x^2 - 4</code> to render curves instantly. Panning and zooming are supported on desktop and touch devices.
           </p>
+          {sessionStatus === 'unauthenticated' && guestUsageReady && (
+            <p className="text-[11px] font-medium text-zinc-400" aria-live="polite">
+              {guestCalculationsUsed} of {GUEST_CALCULATION_LIMIT} free calculations used
+            </p>
+          )}
         </div>
       </div>
 
@@ -782,6 +872,7 @@ export default function GraphingView() {
                       placeholder="e.g. sin(x) or x^2"
                       value={eq.expression}
                       onChange={(e) => handleUpdateExpression(eq.id, e.target.value)}
+                      onBlur={() => saveGraphHistory(equations)}
                       className={`flex-1 py-1 px-2.5 bg-white border text-xs rounded-lg text-zinc-900 font-mono shadow-inner focus:outline-none focus:ring-2 ${
                         eq.error
                           ? 'border-red-300 focus:ring-red-500/20'
