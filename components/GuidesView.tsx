@@ -31,7 +31,7 @@ export default function GuidesView({
         <nav className="flex items-center flex-wrap gap-y-1.5 space-x-1.5 text-[11px] font-mono uppercase tracking-wider text-zinc-400 print:hidden" id="guide-breadcrumbs">
           <button 
             onClick={() => {
-              window.location.href = '/';
+              onSelectGuide(null);
             }} 
             className="hover:text-zinc-950 transition-colors cursor-pointer focus:outline-none"
           >

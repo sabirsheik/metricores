@@ -28,6 +28,7 @@ export default function RootLayoutClient({
   } = useAppContext();
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleTabChange = (newTab: string) => {
     if (newTab === "cookie-settings") {
@@ -48,16 +49,19 @@ export default function RootLayoutClient({
     } else {
       targetPath = `/${newTab}`;
     }
+    setIsNavigating(true);
     router.push(targetPath);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const handleSelectCalculator = (id: string) => {
+    setIsNavigating(true);
     router.push(`/calculators/${id}`);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const handleSelectGuide = (id: string | null) => {
+    setIsNavigating(true);
     if (id) {
       router.push(`/guides#${id}`);
     } else {
@@ -71,6 +75,10 @@ export default function RootLayoutClient({
     root.classList.remove("dark");
     localStorage.setItem("metricores-theme", "light");
   }, []);
+
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
 
   const hideChrome =
     pathname === "/auth" ||
@@ -106,16 +114,28 @@ export default function RootLayoutClient({
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
-              initial={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.08, ease: "easeOut" }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
               className="w-full"
             >
               {children}
             </motion.div>
           </AnimatePresence>
         </main>
+        <AnimatePresence>
+          {isNavigating && (
+            <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={{ scaleX: 1, opacity: 1 }}
+              exit={{ scaleX: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed left-0 right-0 top-0 z-[60] h-0.5 origin-left bg-blue-600"
+              aria-label="Loading next view"
+            />
+          )}
+        </AnimatePresence>
         {!hideChrome && <Footer onChangeTab={handleTabChange} />}
         <CookieConsent
           isOpen={cookieSettingsOpen}

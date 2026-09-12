@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Zap, ArrowRight } from 'lucide-react';
+import { Search, Zap, ArrowUpRight, Calculator, Landmark, BriefcaseBusiness } from 'lucide-react';
+import { motion } from 'motion/react';
 import { calculatorsData } from '@/data/calculators';
 import { calcIcons } from './CalculatorView';
 
@@ -16,6 +17,12 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
 
   // Extract all unique categories
   const categories = ['All', 'Basic Mathematics', 'Financial Mathematics', 'Practical Mathematics'];
+  const categoryLabels: Record<string, string> = {
+    All: 'ALL',
+    'Basic Mathematics': 'BASIC',
+    'Financial Mathematics': 'FINANCIAL',
+    'Practical Mathematics': 'PRACTICAL'
+  };
 
   // Sync category & search from URL hash if provided
   useEffect(() => {
@@ -68,23 +75,47 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
     }
   });
 
+  const categoryGroups = [
+    {
+      name: 'Basic Mathematics',
+      label: 'BASIC',
+      description: 'Fast tools for everyday mathematical thinking.',
+      icon: Calculator,
+      accent: 'directory-section-basic'
+    },
+    {
+      name: 'Financial Mathematics',
+      label: 'FINANCE',
+      description: 'Make clearer decisions with numbers that matter.',
+      icon: Landmark,
+      accent: 'directory-section-finance'
+    },
+    {
+      name: 'Practical Mathematics',
+      label: 'PRACTICAL',
+      description: 'Useful answers for real-world calculations.',
+      icon: BriefcaseBusiness,
+      accent: 'directory-section-practical'
+    }
+  ];
+
   return (
-    <div className="py-10 md:py-16 max-w-[95%] w-[95%] mx-auto px-4 md:px-6 space-y-10" id="directory-container">
+    <div className="directory-shell py-10 md:py-16 max-w-[95%] w-[95%] mx-auto px-4 md:px-6 space-y-10" id="directory-container">
       {/* Header */}
-      <div className="text-center md:text-left space-y-2.5 max-w-2xl" id="directory-header">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 font-sans block">
-          Calculators Directory
+      <div className="directory-heading text-center space-y-3 max-w-3xl mx-auto" id="directory-header">
+        <span className="directory-kicker text-[10px] font-bold uppercase tracking-[0.24em] text-blue-600 font-sans block">
+          Computational dashboard
         </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 font-heading">
-          All Mathematical Tools
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-[-0.04em] text-zinc-950 font-heading">
+          Explore computational suites
         </h1>
-        <p className="text-sm text-zinc-500 font-sans leading-relaxed">
-          Select any verified mathematical utility below to compute algebraic problems, practical ratios, financial formulas, or geometry/tax estimations.
+        <p className="text-sm md:text-base text-zinc-500 font-sans leading-relaxed max-w-2xl mx-auto">
+          Access clean, high-fidelity mathematical tools immediately by choosing a suite below.
         </p>
       </div>
 
       {/* Filter Row: Search, Sorting & Categories */}
-      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border-b border-zinc-200/50 pb-6" id="directory-filters">
+      <div className="directory-filters flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border-b border-zinc-200/60 pb-6" id="directory-filters">
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:max-w-xl">
           {/* Search */}
           <div className="relative w-full sm:max-w-xs flex items-center" id="search-input-group">
@@ -127,53 +158,70 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
               }`}
               id={`cat-pill-${cat.replace(/\s+/g, '-').toLowerCase()}`}
             >
-              {cat}
+              {categoryLabels[cat]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Grid of matches */}
+      {/* Grouped calculator suites */}
       {sortedCalcs.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="directory-grid">
-          {sortedCalcs.map((calc) => {
-            const Icon = calcIcons[calc.id] || Zap;
+        <div className="space-y-14" id="directory-grid">
+          {categoryGroups.map((group, groupIndex) => {
+            const groupCalcs = sortedCalcs.filter((calc) => calc.category === group.name);
+            if (groupCalcs.length === 0) return null;
+            const GroupIcon = group.icon;
+
             return (
-              <div
-                key={calc.id}
-                className="bg-white border border-zinc-200 rounded-sm p-5 hover:shadow-2xs transition-all duration-200 flex flex-col justify-between h-56"
-                id={`directory-card-${calc.id}`}
+              <motion.section
+                key={group.name}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: groupIndex * 0.08 }}
+                className={`directory-section ${group.accent}`}
+                id={`directory-section-${group.label.toLowerCase()}`}
               >
-                <div className="space-y-3" id={`dir-card-head-${calc.id}`}>
-                  <div className="flex items-center justify-between" id={`dir-card-meta-${calc.id}`}>
-                    <span className="text-[9px] font-medium text-zinc-400 uppercase tracking-wider font-sans">
-                      {calc.category}
-                    </span>
-                  </div>
-                  <div className="flex items-start space-x-3" id={`dir-card-title-row-${calc.id}`}>
-                    <div className="w-8 h-8 bg-zinc-50 rounded-sm border border-zinc-200/50 flex items-center justify-center shrink-0 mt-0.5">
-                      <Icon className="w-4.5 h-4.5 text-zinc-900" />
+                <div className="directory-section-heading flex items-end justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-3">
+                    <div className="directory-section-icon flex items-center justify-center shrink-0">
+                      <GroupIcon className="w-4 h-4" />
                     </div>
-                    <div className="space-y-0.5">
-                      <h2 className="text-sm font-bold text-zinc-900 font-heading">
-                        {calc.name}
-                      </h2>
-                      <p className="text-xs text-zinc-500 font-sans line-clamp-3 leading-relaxed">
-                        {calc.shortDescription}
-                      </p>
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <h2 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-950 font-heading">{group.name}</h2>
+                        <span className="directory-count">{String(groupCalcs.length).padStart(2, '0')}</span>
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-1 font-sans">{group.description}</p>
                     </div>
                   </div>
+                  <span className="hidden sm:block directory-section-label">{group.label} / SUITE</span>
                 </div>
 
-                <button
-                  onClick={() => onSelectCalculator(calc.id)}
-                  className="mt-4 text-xs font-semibold text-zinc-900 hover:text-zinc-950 flex items-center focus:outline-none cursor-pointer"
-                  id={`directory-card-btn-${calc.id}`}
-                >
-                  Open Calculator
-                  <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
-                </button>
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+                  {groupCalcs.map((calc, cardIndex) => {
+                    const Icon = calcIcons[calc.id] || Zap;
+                    return (
+                      <motion.button
+                        key={calc.id}
+                        type="button"
+                        onClick={() => onSelectCalculator(calc.id)}
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, delay: groupIndex * 0.08 + cardIndex * 0.045 }}
+                        className="directory-card text-left"
+                        id={`directory-card-${calc.id}`}
+                      >
+                        <span className="directory-card-icon"><Icon className="w-5 h-5" /></span>
+                        <span className="directory-card-content">
+                          <span className="directory-card-name">{calc.name}</span>
+                          <span className="directory-card-category">{group.label}</span>
+                        </span>
+                        <ArrowUpRight className="directory-card-arrow w-4 h-4" />
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.section>
             );
           })}
         </div>

@@ -58,6 +58,7 @@ export default function Header({
   const [showAll, setShowAll] = useState(false);
   const [isMobileCalcsOpen, setIsMobileCalcsOpen] = useState(false);
   const [mobileShowAll, setMobileShowAll] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Close mobile menu on tab change
   const handleTabClick = (tab: string) => {
@@ -80,6 +81,13 @@ export default function Header({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onOpenSearch]);
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navItems = [
     { label: 'Guides', id: 'guides' },
     { label: 'About', id: 'about' }
@@ -101,7 +109,9 @@ export default function Header({
 
   return (
     <header
-      className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-zinc-200 transition-colors duration-200"
+      className={`sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b transition-all duration-200 ${
+        isScrolled ? 'border-zinc-300 shadow-[0_8px_24px_-18px_rgba(0,0,0,0.35)]' : 'border-zinc-200'
+      }`}
       id="site-header"
     >
       <div className="relative max-w-[95%] w-[95%] mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between" id="header-container">

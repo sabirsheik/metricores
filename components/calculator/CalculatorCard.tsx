@@ -1498,7 +1498,7 @@ export default function CalculatorCard({
                     <span>+{formatCurrency(vatAmount, 'USD')}</span>
                   </div>
 
-                  <div className="flex justify-between font-bold text-zinc-950 border-t border-zinc-950 border-b-4 border-double border-zinc-950 py-3 mt-4 text-sm">
+                  <div className="flex justify-between font-bold text-zinc-950 border-t border-zinc-950 border-b-4 border-double py-3 mt-4 text-sm">
                     <span>GROSS TOTAL (Incl. VAT):</span>
                     <span>{formatCurrency(Number(grossAmount), 'USD')}</span>
                   </div>
@@ -1579,7 +1579,7 @@ export default function CalculatorCard({
     <div className="py-8 md:py-12 max-w-[95%] w-[95%] mx-auto px-4 print:py-0" id={`calc-engine-${calculator.id}`}>
       {/* Breadcrumbs */}
       <nav className="flex items-center space-x-1.5 text-[10px] sm:text-[11px] font-sans text-zinc-400 mb-4 print:hidden" id="calculator-breadcrumbs">
-        <button onClick={() => window.location.href = '/'} className="hover:text-zinc-950 transition-colors cursor-pointer focus:outline-none">Home</button>
+        <button onClick={onBack} className="hover:text-zinc-950 transition-colors cursor-pointer focus:outline-none">Home</button>
         <span className="text-zinc-300">&gt;</span>
         <span className="text-zinc-500 font-medium">{calculator.category}</span>
         <span className="text-zinc-300">&gt;</span>
@@ -1642,7 +1642,7 @@ export default function CalculatorCard({
       {/* Related System Directory Links */}
       <div className="border-t border-zinc-200 pt-10 print:hidden" id="related-section">
         <div className="flex items-center justify-between mb-6" id="related-header">
-          <h2 className="text-sm font-bold text-zinc-900 font-heading uppercase tracking-wider text-zinc-400">
+          <h2 className="text-sm font-bold text-zinc-400 font-heading uppercase tracking-wider">
             Related Calculators
           </h2>
         </div>

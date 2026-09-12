@@ -9,6 +9,171 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
+.directory-shell {
+  background: radial-gradient(circle at 50% -10%, rgba(219, 234, 254, 0.72), transparent 34rem);
+}
+
+.directory-kicker,
+.directory-section-label,
+.directory-card-category {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.directory-filters {
+  background: rgba(250, 250, 250, 0.78);
+}
+
+.directory-section-heading {
+  position: relative;
+}
+
+.directory-section-heading::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  margin-bottom: 0.65rem;
+  background: linear-gradient(90deg, rgba(24, 24, 27, 0.16), transparent);
+}
+
+.directory-section-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(24, 24, 27, 0.12);
+  border-radius: 0.75rem;
+  background: white;
+  color: #18181b;
+  box-shadow: 0 8px 18px rgba(24, 24, 27, 0.06);
+}
+
+.directory-count {
+  color: #a1a1aa;
+  font: 500 0.68rem/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+}
+
+.directory-section-label {
+  color: #a1a1aa;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+}
+
+.directory-card {
+  position: relative;
+  display: flex;
+  min-height: 8.8rem;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  overflow: hidden;
+  border: 1px solid #e4e4e7;
+  border-radius: 0;
+  padding: 1.05rem;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  text-align: left;
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.directory-card::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0 0 0 2.75rem;
+  background: rgba(9, 9, 11, 0.08);
+  content: '';
+  transition: width 220ms ease, height 220ms ease;
+}
+
+.directory-card:hover {
+  transform: translateY(-4px);
+  border-color: #a1a1aa;
+  background: white;
+  box-shadow: 0 16px 28px rgba(24, 24, 27, 0.09);
+}
+
+.directory-card:hover::before {
+  width: 4rem;
+  height: 4rem;
+}
+
+.directory-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.directory-card-icon {
+  position: relative;
+  display: flex;
+  width: 2.65rem;
+  height: 2.65rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.25rem;
+  background: #fafafa;
+  color: #27272a;
+  transition: transform 220ms ease, background 220ms ease;
+}
+
+.directory-card:hover .directory-card-icon {
+  transform: rotate(-5deg) scale(1.05);
+  background: #eff6ff;
+}
+
+.directory-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.directory-card-name {
+  color: #09090b;
+  font: 700 0.95rem/1.2 Geist, sans-serif;
+}
+
+.directory-card-category {
+  color: #a1a1aa;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+}
+
+.directory-card-arrow {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  color: #a1a1aa;
+  transition: transform 220ms ease, color 220ms ease;
+}
+
+.directory-card:hover .directory-card-arrow {
+  color: #2563eb;
+  transform: translate(2px, -2px);
+}
+
+.directory-section-finance .directory-section-icon,
+.directory-section-finance .directory-card:hover .directory-card-icon {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.directory-section-practical .directory-section-icon,
+.directory-section-practical .directory-card:hover .directory-card-icon {
+  color: #c2410c;
+  background: #fff7ed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directory-card,
+  .directory-card::before,
+  .directory-card-icon,
+  .directory-card-arrow {
+    transition: none;
+  }
+}
+
 /* Custom focus ring utility for inputs */
 .focus-ring {
   @apply focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all;

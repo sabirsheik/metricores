@@ -98,3 +98,37 @@ export function ResultCardSkeleton() {
     </div>
   );
 }
+
+export function CalculatorSuiteSkeleton() {
+  return (
+    <div className="directory-shell mx-auto w-[95%] space-y-10 px-4 py-12 md:px-6 md:py-16" aria-label="Loading calculator suites">
+      <div className="mx-auto max-w-3xl space-y-3 text-center">
+        <Skeleton className="mx-auto h-3 w-36" />
+        <Skeleton className="mx-auto h-12 w-3/4" />
+        <Skeleton className="mx-auto h-4 w-full max-w-xl" />
+      </div>
+      <div className="space-y-12">
+        {[1, 2, 3].map((section) => (
+          <section key={section} className="space-y-5">
+            <div className="flex items-end justify-between border-b border-zinc-200 pb-4">
+              <div className="space-y-2"><Skeleton className="h-7 w-56" /><Skeleton className="h-3 w-72" /></div>
+              <Skeleton className="hidden h-3 w-24 sm:block" />
+            </div>
+            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((card) => <Skeleton key={card} className="h-36 w-full rounded-xl" />)}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CalculatorWorkspaceSkeleton() {
+  return (
+    <div className="mx-auto grid w-[95%] max-w-6xl gap-6 px-4 py-12 md:grid-cols-2 md:px-6 md:py-16" aria-label="Loading calculator">
+      <div className="space-y-5"><Skeleton className="h-4 w-28" /><Skeleton className="h-10 w-3/4" /><Skeleton className="h-4 w-full" /><CalculatorCardSkeleton /></div>
+      <ResultCardSkeleton />
+    </div>
+  );
+}

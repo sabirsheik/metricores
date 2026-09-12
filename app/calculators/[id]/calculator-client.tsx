@@ -1,10 +1,18 @@
 "use client";
 
-import CalculatorView from "@/components/CalculatorView";
-import GraphingView from "@/components/GraphingView";
+import dynamic from "next/dynamic";
 import { calculatorsData } from "@/data/calculators";
 import { useParams, useRouter as useNextRouter } from "next/navigation";
 import type { CalculatorId } from "@/types";
+import { CalculatorWorkspaceSkeleton } from "@/components/ui/Skeleton";
+
+const CalculatorView = dynamic(() => import("@/components/CalculatorView"), {
+  loading: () => <CalculatorWorkspaceSkeleton />
+});
+
+const GraphingView = dynamic(() => import("@/components/GraphingView"), {
+  loading: () => <CalculatorWorkspaceSkeleton />
+});
 
 export default function CalculatorClient() {
   const params = useParams();

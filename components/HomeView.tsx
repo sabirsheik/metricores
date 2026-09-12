@@ -67,6 +67,27 @@ const toolDisplayData: Record<string, { label: string; tag?: string }> = {
   vat: { label: 'VAT Tax' },
 };
 
+const calculatorSuites = [
+  {
+    name: 'Basic Mathematics',
+    label: 'BASIC',
+    description: 'Core tools for fast, everyday calculations.',
+    accent: 'directory-section-basic'
+  },
+  {
+    name: 'Financial Mathematics',
+    label: 'FINANCE',
+    description: 'Model money, rates, returns, and repayments.',
+    accent: 'directory-section-finance'
+  },
+  {
+    name: 'Practical Mathematics',
+    label: 'PRACTICAL',
+    description: 'Useful answers for real-world decisions.',
+    accent: 'directory-section-practical'
+  }
+];
+
 export default function HomeView({
   onNavigateToTab,
   onNavigateToCalculator,
@@ -430,40 +451,63 @@ export default function HomeView({
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-5 justify-center max-w-6xl mx-auto" id="squircles-grid">
-            {calcsList.map((calc) => {
-              const CardIcon = calcIcons[calc.id] || Zap;
-              const display = toolDisplayData[calc.id] || { label: calc.name };
+          <div className="space-y-12 max-w-6xl mx-auto" id="squircles-grid">
+            {calculatorSuites.map((suite, suiteIndex) => {
+              const suiteCalcs = calcsList.filter((calc) => calc.category === suite.name);
+              if (suiteCalcs.length === 0) return null;
 
               return (
-                <div
-                  key={calc.id}
-                  onClick={() => onNavigateToCalculator(calc.id)}
-                  className="flex flex-col items-center justify-between text-center p-6 min-h-[175px] rounded-xl bg-white border border-zinc-200 hover:border-zinc-300 hover:shadow-[0_12px_24px_-10px_rgba(0,0,0,0.06),0_4px_12px_-4px_rgba(0,0,0,0.02)] hover:scale-[1.02] active:scale-[0.99] transition-all duration-300 cursor-pointer group select-none relative"
-                  id={`squircle-item-${calc.id}`}
+                <motion.div
+                  key={suite.name}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.45, delay: suiteIndex * 0.08 }}
+                  className={`directory-section ${suite.accent}`}
+                  id={`squircle-suite-${suite.label.toLowerCase()}`}
                 >
-                  {/* Elegant centered micro tile container */}
-                  <div className="relative flex items-center justify-center w-full pt-1.5">
-                    <div className="w-12 h-12 rounded-xl bg-zinc-50 border border-zinc-200/60 flex items-center justify-center text-zinc-800 group-hover:bg-zinc-100 group-hover:text-zinc-950 transition-all duration-200 shadow-3xs">
-                      <CardIcon className="w-5 h-5 stroke-[1.8]" />
+                  <div className="directory-section-heading flex items-end justify-between gap-4 mb-5">
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <h3 className="text-xl md:text-2xl font-bold tracking-tight text-zinc-950 font-heading">{suite.name}</h3>
+                        <span className="directory-count">{String(suiteCalcs.length).padStart(2, '0')}</span>
+                      </div>
+                      <p className="text-xs text-zinc-500 mt-1 font-sans">{suite.description}</p>
                     </div>
-                    {/* Centered Black Beta/Updated tag */}
-                    {display.tag && (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-zinc-900 border border-zinc-850 text-[8px] font-extrabold tracking-widest text-white rounded-xs uppercase font-mono shadow-xs select-none">
-                        {display.tag}
-                      </span>
-                    )}
+                    <span className="hidden sm:block directory-section-label">{suite.label} / SUITE</span>
                   </div>
 
-                  <div className="space-y-1.5 pt-3 w-full">
-                    <span className="text-sm font-bold text-zinc-950 font-sans tracking-tight leading-snug group-hover:text-black block">
-                      {display.label}
-                    </span>
-                    <span className="text-[9px] text-zinc-400 uppercase font-black tracking-widest block font-mono">
-                      {calc.category.replace(' Mathematics', '')}
-                    </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5">
+                    {suiteCalcs.map((calc, cardIndex) => {
+                      const CardIcon = calcIcons[calc.id] || Zap;
+                      const display = toolDisplayData[calc.id] || { label: calc.name };
+
+                      return (
+                        <motion.button
+                          key={calc.id}
+                          type="button"
+                          onClick={() => onNavigateToCalculator(calc.id)}
+                          initial={{ opacity: 0, y: 12 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, amount: 0.15 }}
+                          transition={{ duration: 0.32, delay: suiteIndex * 0.08 + cardIndex * 0.04 }}
+                          className="directory-card text-left"
+                          id={`squircle-item-${calc.id}`}
+                        >
+                          <span className="directory-card-icon">
+                            <CardIcon className="w-5 h-5 stroke-[1.8]" />
+                            {display.tag && <span className="absolute -top-3 -right-3 bg-zinc-900 text-white text-[7px] px-1.5 py-0.5 font-mono tracking-widest">{display.tag}</span>}
+                          </span>
+                          <span className="directory-card-content">
+                            <span className="directory-card-name">{display.label}</span>
+                            <span className="directory-card-category">{suite.label}</span>
+                          </span>
+                          <ArrowRight className="directory-card-arrow w-4 h-4" />
+                        </motion.button>
+                      );
+                    })}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

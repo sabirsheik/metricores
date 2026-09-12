@@ -1,14 +1,56 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_PORT === '465',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const smtpHost = process.env.SMTP_HOST;
+const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+const smtpFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM;
+
+const hasUsableSmtpConfig = Boolean(
+  smtpHost &&
+  smtpHost !== 'smtp.example.com' &&
+  smtpUser &&
+  smtpPass &&
+  smtpFrom
+);
+
+const transporter = hasUsableSmtpConfig
+  ? nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    })
+  : null;
+
+const sendEmail = async (to: string, subject: string, html: string, previewUrl: string) => {
+  if (!transporter) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[Email] SMTP is not configured. Development link for ${to}: ${previewUrl}`);
+      return;
+    }
+
+    throw new Error('Email service is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, and SMTP_FROM.');
+  }
+
+  await transporter.sendMail({
+    from: smtpFrom,
+    sender: smtpFrom,
+    replyTo: smtpFrom,
+    to,
+    subject,
+    html,
+    headers: {
+      'List-Unsubscribe': '<mailto:unsubscribe@metricores.com>',
+      'X-Priority': '3',
+      'X-MSMail-Priority': 'Normal',
+      'Importance': 'Normal',
+    },
+  });
+};
 
 export const sendVerificationEmail = async (email: string, fullName: string, token: string) => {
   // Point directly to the API route so the server can verify and redirect
@@ -142,20 +184,7 @@ export const sendVerificationEmail = async (email: string, fullName: string, tok
 </html>
   `;
   
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    sender: process.env.SMTP_FROM,
-    replyTo: process.env.SMTP_FROM,
-    to: email,
-    subject: 'Verify your email - Metricores',
-    html,
-    headers: {
-      'List-Unsubscribe': '<mailto:unsubscribe@metricores.com>',
-      'X-Priority': '3',
-      'X-MSMail-Priority': 'Normal',
-      'Importance': 'Normal'
-    }
-  });
+  await sendEmail(email, 'Verify your email - Metricores', html, verificationUrl);
 };
 
 export const sendPasswordResetEmail = async (email: string, fullName: string, token: string) => {
@@ -289,18 +318,5 @@ export const sendPasswordResetEmail = async (email: string, fullName: string, to
 </html>
   `;
   
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    sender: process.env.SMTP_FROM,
-    replyTo: process.env.SMTP_FROM,
-    to: email,
-    subject: 'Reset your password - Metricores',
-    html,
-    headers: {
-      'List-Unsubscribe': '<mailto:unsubscribe@metricores.com>',
-      'X-Priority': '3',
-      'X-MSMail-Priority': 'Normal',
-      'Importance': 'Normal'
-    }
-  });
+  await sendEmail(email, 'Reset your password - Metricores', html, resetUrl);
 };
