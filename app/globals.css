@@ -179,6 +179,27 @@ body {
   @apply focus:outline-none focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all;
 }
 
+.workspace-skeleton-shimmer {
+  background: linear-gradient(100deg, #f4f4f5 25%, #fafafa 45%, #f4f4f5 65%);
+  background-size: 220% 100%;
+  animation: workspace-skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes workspace-skeleton-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-skeleton-shimmer {
+    animation: none;
+  }
+}
+
 /* Scientific Calculator Styles */
 .calc-sci-btn {
   @apply bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-mono text-[11px] py-2.5 rounded-md transition-all active:scale-95 border border-zinc-800/80 cursor-pointer focus:outline-none flex items-center justify-center font-semibold select-none;

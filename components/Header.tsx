@@ -59,6 +59,11 @@ export default function Header({
   const [isMobileCalcsOpen, setIsMobileCalcsOpen] = useState(false);
   const [mobileShowAll, setMobileShowAll] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [session?.user?.image]);
 
   // Close mobile menu on tab change
   const handleTabClick = (tab: string) => {
@@ -286,12 +291,13 @@ export default function Header({
                   onClick={() => router.push('/profile')}
                   className="flex items-center space-x-2 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 rounded-sm border border-zinc-200 transition-colors cursor-pointer"
                 >
-                  {session.user?.image ? (
+                  {session.user?.image && !imageError ? (
                     <img 
                       src={session.user.image} 
                       alt="User" 
                       className="w-6 h-6 rounded-full object-cover" 
                       referrerPolicy="no-referrer"
+                      onError={() => setImageError(true)}
                     />
                   ) : (
                     <User className="w-4 h-4 text-zinc-500" />

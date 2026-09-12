@@ -58,6 +58,7 @@ export default function ProfileView() {
   // Initialize form when session loads
   useEffect(() => {
     if (session?.user) {
+      setImageError(false);
       setProfileForm({
         fullName: session.user.name || '',
         username: '',

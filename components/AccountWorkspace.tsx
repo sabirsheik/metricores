@@ -83,8 +83,16 @@ export default function AccountWorkspace() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-3 p-6 md:grid-cols-4">
-          {[1, 2, 3, 4].map((item) => <div key={item} className="h-24 animate-pulse bg-zinc-100" />)}
+        <div className="grid gap-4 p-6 md:grid-cols-2" aria-busy="true" aria-label="Loading workspace">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="border border-zinc-200 p-4" aria-hidden="true">
+              <div className="flex items-center gap-2">
+                <div className="workspace-skeleton-shimmer h-6 w-6 rounded-full" />
+                <div className="workspace-skeleton-shimmer h-3 w-32" />
+              </div>
+              <div className="workspace-skeleton-shimmer mt-4 h-4 w-3/4" />
+            </div>
+          ))}
         </div>
       ) : tab === 'overview' ? (
         <div className="grid gap-4 p-6 md:grid-cols-2">

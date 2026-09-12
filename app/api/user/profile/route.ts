@@ -14,6 +14,9 @@ export async function PUT(request: Request) {
 
     await dbConnect();
     const { fullName, username, bio, profilePicture } = await request.json();
+    const profileImage = typeof profilePicture === 'string' && /^https?:\/\//i.test(profilePicture)
+      ? profilePicture
+      : undefined;
 
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
@@ -22,7 +25,7 @@ export async function PUT(request: Request) {
         fullName: fullName || session.user.name,
         username: username || undefined,
         bio: bio || undefined,
-        profilePicture: profilePicture || undefined,
+        ...(profileImage ? { profilePicture: profileImage } : {}),
       },
       { new: true, runValidators: true }
     );

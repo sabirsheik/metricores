@@ -12,6 +12,11 @@ const debug = (message: string, ...data: any[]) => {
   ));
 };
 
+function getProviderImage(profile: any, user: any): string | undefined {
+  const image = profile?.picture || profile?.image || user?.image;
+  return typeof image === 'string' && /^https?:\/\//i.test(image) ? image : undefined;
+}
+
 export const authOptions: NextAuthOptions = {
   debug: true, // Enable NextAuth debug mode
   providers: [
@@ -102,6 +107,7 @@ export const authOptions: NextAuthOptions = {
 
         if (account?.provider === 'google' && profile) {
           debug('Processing Google sign-in for:', profile.email);
+          const providerImage = getProviderImage(profile, user);
 
           const existingUser = await User.findOne({ email: profile.email });
           debug('Existing user found:', existingUser ? 'Yes' : 'No');
@@ -112,7 +118,7 @@ export const authOptions: NextAuthOptions = {
             googleUser = await User.create({
               fullName: profile.name || '',
               email: profile.email,
-              profilePicture: profile.image,
+              profilePicture: providerImage || '',
               provider: 'google',
               emailVerified: true,
               lastLogin: new Date(),
@@ -121,7 +127,7 @@ export const authOptions: NextAuthOptions = {
           } else {
             debug('Updating existing user');
             googleUser.lastLogin = new Date();
-            googleUser.profilePicture = profile.image || googleUser.profilePicture;
+            if (providerImage) googleUser.profilePicture = providerImage;
             googleUser.fullName = profile.name || googleUser.fullName;
             await googleUser.save();
             debug('User updated with lastLogin:', googleUser.lastLogin);
@@ -165,7 +171,7 @@ export const authOptions: NextAuthOptions = {
             session.user.id = dbUser._id.toString();
             session.user.name = dbUser.fullName;
             session.user.email = dbUser.email;
-            session.user.image = dbUser.profilePicture;
+            session.user.image = dbUser.profilePicture || token.picture || null;
             // Add custom fields to session - explicitly convert to Date objects
             (session.user as any).provider = dbUser.provider;
             (session.user as any).createdAt = dbUser.createdAt ? new Date(dbUser.createdAt).toISOString() : null;
