@@ -30,8 +30,12 @@ import {
   Utensils,
   TrendingDown,
   ShieldCheck,
-  BookOpen
+  BookOpen,
+  Heart,
+  Bookmark,
+  LogIn
 } from 'lucide-react';
+import { useSession, signIn } from 'next-auth/react';
 import { CalculatorSchema, ResultField } from '@/types';
 import { calculate, calculatorsData } from '@/data/calculators';
 import InputField from './InputField';
@@ -77,6 +81,7 @@ export default function CalculatorCard({
 }: CalculatorCardProps) {
   const IconComponent = calcIcons[calculator.id] || Percent;
   const { addToast } = useToast();
+  const { data: session } = useSession();
 
   // Parameters State
   const [inputs, setInputs] = useState<Record<string, any>>({});
@@ -85,6 +90,18 @@ export default function CalculatorCard({
   const [isCalculating, setIsCalculating] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [saveName, setSaveName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user || calculator.id === 'scientific') return;
+    fetch('/api/user/workspace')
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => setIsFavorite(Boolean(data?.workspace?.favorites?.includes(calculator.id))))
+      .catch(() => undefined);
+  }, [calculator.id, session]);
 
   // Sync parameters and run initial calculation on mount / calculator swap
   useEffect(() => {
@@ -93,11 +110,26 @@ export default function CalculatorCard({
     calculator.inputs.forEach((field) => {
       defaultInputs[field.id] = field.defaultValue;
     });
-    setInputs(defaultInputs);
+    let restoredInputs = defaultInputs;
+    let restoredResults: ResultField[] | null = null;
+    try {
+      const stored = window.localStorage.getItem('metricores_restore_calculation');
+      if (stored) {
+        const record = JSON.parse(stored);
+        if (record.calculatorId === calculator.id) {
+          restoredInputs = { ...defaultInputs, ...record.inputs };
+          restoredResults = record.results;
+          window.localStorage.removeItem('metricores_restore_calculation');
+        }
+      }
+    } catch {
+      window.localStorage.removeItem('metricores_restore_calculation');
+    }
+    setInputs(restoredInputs);
     setErrors({});
     
     try {
-      const initialResults = calculate(calculator.id, defaultInputs);
+      const initialResults = restoredResults || calculate(calculator.id, restoredInputs);
       setResults(initialResults);
     } catch (e) {
       console.error('Initial engine pre-calc failure:', e);
@@ -173,6 +205,13 @@ export default function CalculatorCard({
       try {
         const computed = calculate(calculator.id, inputs);
         setResults(computed);
+        if (session?.user && calculator.id !== 'scientific') {
+          void fetch('/api/user/workspace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'history', calculatorId: calculator.id, inputs, results: computed }),
+          });
+        }
         addToast('Calculation completed successfully!', 'success');
       } catch (err) {
         console.error('Calculation execution failed:', err);
@@ -181,6 +220,49 @@ export default function CalculatorCard({
         setIsCalculating(false);
       }
     }, 250);
+  };
+
+  const handleFavorite = async () => {
+    if (!session?.user) {
+      await signIn(undefined, { callbackUrl: window.location.pathname });
+      return;
+    }
+    const nextValue = !isFavorite;
+    setIsFavorite(nextValue);
+    const response = await fetch('/api/user/workspace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'favorite', calculatorId: calculator.id, enabled: nextValue }),
+    });
+    if (!response.ok) setIsFavorite(!nextValue);
+    else addToast(nextValue ? 'Added to favorites.' : 'Removed from favorites.', 'success');
+  };
+
+  const handleSaveCalculation = async () => {
+    if (!session?.user) {
+      await signIn(undefined, { callbackUrl: window.location.pathname });
+      return;
+    }
+    if (results.length === 0) {
+      addToast('Calculate a result before saving it.', 'info');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/user/workspace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save', calculatorId: calculator.id, inputs, results, name: saveName }),
+      });
+      if (!response.ok) throw new Error('Unable to save calculation');
+      setSaveName('');
+      setShowSaveInput(false);
+      addToast('Calculation saved to your workspace.', 'success');
+    } catch (error) {
+      addToast('Unable to save calculation right now.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -1613,6 +1695,52 @@ export default function CalculatorCard({
           </p>
         </div>
       </div>
+
+      {calculator.id !== 'scientific' && (
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-sm border border-zinc-200 bg-white px-4 py-3 print:hidden">
+          <div className="flex items-center gap-2 text-xs text-zinc-500">
+            <Bookmark className="h-4 w-4 text-zinc-400" />
+            {session?.user ? 'Keep your work available across devices.' : 'Calculate freely, then save work to your account.'}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {session?.user ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleFavorite}
+                  className="inline-flex items-center gap-1.5 border border-zinc-200 px-3 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+                >
+                  <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+                  {isFavorite ? 'Favorited' : 'Favorite'}
+                </button>
+                {showSaveInput ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      value={saveName}
+                      onChange={(event) => setSaveName(event.target.value)}
+                      placeholder="Optional name"
+                      aria-label="Saved calculation name"
+                      className="w-36 border border-zinc-200 px-3 py-2 text-xs outline-none focus:border-zinc-900"
+                      autoFocus
+                    />
+                    <button type="button" onClick={handleSaveCalculation} disabled={isSaving} className="bg-zinc-950 px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-800 disabled:opacity-60">
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => setShowSaveInput(true)} className="inline-flex items-center gap-1.5 bg-zinc-950 px-3 py-2 text-xs font-semibold text-white hover:bg-zinc-800">
+                    <Bookmark className="h-3.5 w-3.5" /> Save calculation
+                  </button>
+                )}
+              </>
+            ) : (
+              <button type="button" onClick={() => signIn(undefined, { callbackUrl: window.location.pathname })} className="inline-flex items-center gap-1.5 border border-zinc-300 px-3 py-2 text-xs font-semibold text-zinc-800 hover:bg-zinc-50">
+                <LogIn className="h-3.5 w-3.5" /> Sign in to save
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Parameters Config & Results Grid */}
       <div className="mb-12">

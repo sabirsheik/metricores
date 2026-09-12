@@ -63,6 +63,24 @@ export interface CalculatorSchema {
   faqs: FAQItem[];
 }
 
+export interface CalculationRecord {
+  id: string;
+  calculatorId: CalculatorId;
+  calculatorName: string;
+  category: CalculatorSchema['category'];
+  inputs: Record<string, unknown>;
+  results: ResultField[];
+  name?: string;
+  createdAt: string;
+}
+
+export interface CalculatorWorkspace {
+  history: CalculationRecord[];
+  saved: CalculationRecord[];
+  favorites: CalculatorId[];
+  recentlyUsed: CalculatorId[];
+}
+
 export interface GuideArticle {
   id: string;
   title: string;
@@ -99,4 +117,8 @@ export interface User {
   resetPasswordTokenExpires?: Date;
   resetAttempts?: number;
   lastResetSent?: Date;
+  history?: CalculationRecord[];
+  savedCalculations?: CalculationRecord[];
+  favoriteCalculators?: CalculatorId[];
+  recentlyUsed?: CalculatorId[];
 }

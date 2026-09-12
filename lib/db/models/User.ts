@@ -1,7 +1,21 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
-import { User as IUser } from '@/types';
+import { User as IUser, CalculationRecord } from '@/types';
 
 interface UserDocument extends Omit<IUser, '_id'>, Document<Types.ObjectId> {}
+
+const CalculationRecordSchema = new Schema<CalculationRecord>(
+  {
+    id: { type: String, required: true },
+    calculatorId: { type: String, required: true },
+    calculatorName: { type: String, required: true },
+    category: { type: String, required: true },
+    inputs: { type: Schema.Types.Mixed, required: true },
+    results: { type: Schema.Types.Mixed, required: true },
+    name: { type: String, trim: true, maxlength: 120 },
+    createdAt: { type: String, required: true },
+  },
+  { _id: false }
+);
 
 const UserSchema = new Schema<UserDocument>(
   {
@@ -96,6 +110,10 @@ const UserSchema = new Schema<UserDocument>(
     lastResetSent: {
       type: Date,
     },
+    history: { type: [CalculationRecordSchema], default: [] },
+    savedCalculations: { type: [CalculationRecordSchema], default: [] },
+    favoriteCalculators: { type: [String], default: [] },
+    recentlyUsed: { type: [String], default: [] },
   },
   {
     timestamps: true,

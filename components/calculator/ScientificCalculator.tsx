@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Clock, Trash2, ArrowLeftRight, HelpCircle, Delete, CornerDownLeft } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface HistoryItem {
   id: string;
@@ -9,6 +10,7 @@ interface HistoryItem {
 }
 
 export default function ScientificCalculator() {
+  const { data: session } = useSession();
   const [display, setDisplay] = useState('0');
   const [expression, setExpression] = useState('');
   const [isDeg, setIsDeg] = useState(true);
@@ -203,6 +205,18 @@ export default function ScientificCalculator() {
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           };
           saveHistory([newItem, ...history].slice(0, 30));
+          if (session?.user) {
+            void fetch('/api/user/workspace', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'history',
+                calculatorId: 'scientific',
+                inputs: { expression: balancedExpr, mode: isDeg ? 'DEG' : 'RAD' },
+                results: [{ id: 'result', label: 'Result', value: resultStr, isPrimary: true, format: 'number' }],
+              }),
+            });
+          }
 
         } catch (err) {
           setDisplay('Error');

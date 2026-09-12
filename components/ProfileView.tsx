@@ -12,6 +12,7 @@ import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { cn } from '@/utils/cn';
 import { validatePassword } from '@/utils/password';
+import AccountWorkspace from './AccountWorkspace';
 
 export default function ProfileView() {
   const { data: session, status, update } = useSession();
@@ -203,6 +204,7 @@ export default function ProfileView() {
           transition={{ duration: 0.3 }}
           className="max-w-5xl mx-auto"
         >
+          <AccountWorkspace />
           {/* Profile Header */}
           <div className="bg-white border border-zinc-200 rounded-sm p-6 md:p-8 shadow-sm mb-6">
             <div className="flex flex-col md:flex-row md:items-center gap-6">
