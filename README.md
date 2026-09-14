@@ -1,134 +1,124 @@
 # Metricores
 
-Metricores is a web-based calculator workspace built with Next.js. It combines everyday financial and practical calculators with scientific and graphing tools, explanatory formulas, examples, FAQs, and optional user accounts for saving calculation history and preferences.
+> A focused calculator workspace for faster, clearer everyday decisions.
 
-## Highlights
+Metricores brings practical finance, business, time, mathematics, and graphing tools into one responsive web experience. Each calculator is designed to turn a small set of inputs into an understandable result, with formulas, examples, and FAQs that help users make sense of the output.
 
-- 14 calculators across mathematics, finance, tax, time, and everyday planning
-- Scientific calculator with DEG/RAD modes, trigonometry, logarithms, memory, keyboard input, and local history
-- Interactive graphing calculator with multiple expressions, pan and zoom, grid/axis controls, themes, presets, fullscreen mode, and image export
-- Formula explanations, worked examples, and FAQs for calculator pages
-- Guest usage limits with browser-based tracking
-- Credentials authentication with email verification and password reset
-- Google OAuth sign-in
-- Authenticated profile and workspace features for saved calculations, favorites, recent calculators, and history
-- Responsive interface with shared navigation, toast notifications, cookie preferences, and loading states
+The product supports both quick, no-account calculations and a signed-in workspace for people who want to save results, revisit previous work, and build a repeatable calculation workflow.
 
-## Calculator Directory
+## Product Positioning
 
-| Calculator | Purpose |
+Most calculator sites are built around isolated one-off tools. Metricores is structured as a reusable calculation workspace:
+
+- **Fast to use:** focused input flows with immediate, readable results
+- **Easy to understand:** formulas, worked examples, and contextual FAQs accompany the calculation
+- **Broad enough for real work:** financial, operational, scientific, and graphing tools share one product surface
+- **Ready for repeat use:** authenticated users can keep saved calculations, favorites, recent tools, and workspace history
+- **Accessible from anywhere:** responsive layouts support desktop and mobile workflows
+
+## Product Modules
+
+### Calculator Workspace
+
+The core directory includes 14 calculators for financial planning, business analysis, mathematics, and everyday decisions.
+
+| Area | Included tools |
 | --- | --- |
-| Scientific | Advanced arithmetic, functions, trigonometry, logarithms, exponentials, factorials, and memory operations |
-| Graphing | Plot supported mathematical expressions on an interactive coordinate plane |
-| Mortgage | Estimate monthly payment, total interest, and total mortgage cost |
-| Loan | Estimate amortized payments, total interest, and total repayment |
-| Tax | Estimate simplified progressive federal tax and take-home amount |
-| Interest | Model simple or monthly-compounded growth with contributions |
-| Payment | Calculate a required payment or estimate payoff duration |
-| Time | Compare dates, calculate business days, and offset dates |
-| Profit Margin | Analyze margin and markup or calculate a target selling price |
-| ROI | Calculate profit, total ROI, and annualized ROI/CAGR |
-| Percentage | Calculate percentages, proportions, and percentage change |
-| Discount | Calculate savings, sale price, sales tax, and final price |
-| Tip | Calculate tip, total bill, and per-person share |
-| VAT | Add or remove VAT and calculate net or gross amounts |
+| Mathematics | Scientific, Graphing, Percentage |
+| Personal finance | Mortgage, Loan, Interest, Payment, ROI, Discount, Tip, VAT |
+| Business analysis | Profit Margin |
+| Planning | Tax, Time |
 
-The calculator registry and general calculation dispatcher live in [`data/calculators.ts`](data/calculators.ts). The scientific calculator is implemented in [`components/calculator/ScientificCalculator.tsx`](components/calculator/ScientificCalculator.tsx), while graphing expressions are parsed by [`utils/mathParser.ts`](utils/mathParser.ts) and rendered by [`components/GraphingView.tsx`](components/GraphingView.tsx).
+The scientific calculator supports DEG/RAD modes, trigonometric and logarithmic functions, exponentials, factorials, memory operations, keyboard input, and local history. The graphing calculator supports multiple expressions, real-time parsing, pan and zoom, grid and axis controls, presets, themes, fullscreen mode, and downloadable output.
 
-## User-Facing Routes
+### Guides and Education
 
-| Route | Description |
+Calculator pages include formula explanations, worked examples, and FAQs. The guides area extends that experience with practical strategy content so users can understand the decision behind a number, not only the number itself.
+
+### Account and Workspace
+
+Users can start as guests and move to an account when they need continuity. Registered users can:
+
+- Save calculations and calculation history
+- Mark calculators as favorites
+- Review recently used calculators
+- Update profile and security settings
+- Sign in with email credentials or Google
+
+Email verification and password recovery are included for credentials-based accounts.
+
+## Product Preview
+
+The repository does not currently include committed screenshot assets. The recommended documentation structure is:
+
+```text
+docs/
+└── screenshots/
+    ├── home-dashboard.png
+    ├── calculator-workspace.png
+    ├── graphing-calculator.png
+    └── account-workspace.png
+```
+
+When product screenshots are added, this section can be extended with the following views:
+
+| View | What it should demonstrate |
+| --- | --- |
+| Home dashboard | Calculator discovery and the primary product experience |
+| Calculator workspace | Input, result, formula, example, and FAQ flow |
+| Graphing calculator | Expression entry, plotted output, and interactive controls |
+| Account workspace | Saved calculations, history, favorites, and profile controls |
+
+## Why Metricores
+
+Metricores is designed for users who need more confidence than a bare result field provides, without the friction of a heavyweight spreadsheet or specialized finance application.
+
+- **For individuals:** estimate payments, taxes, tips, discounts, interest, and returns
+- **For small teams:** standardize quick business calculations such as margin, ROI, VAT, and payment planning
+- **For learners:** connect results to formulas, examples, and plain-language explanations
+- **For repeat workflows:** save the calculations and tools that matter most
+
+## Technology and Architecture
+
+| Layer | Implementation |
+| --- | --- |
+| Application | Next.js App Router 16, React 19, TypeScript |
+| UI | Tailwind CSS, Motion, Lucide React, Sonner |
+| Forms and validation | React Hook Form and Zod |
+| Authentication | NextAuth with credentials and Google providers |
+| Data | MongoDB with Mongoose |
+| Email | Nodemailer for verification and password recovery |
+| Security | `bcryptjs` password hashing, expiring token flows, rate limits |
+
+The application is organized around a registry-driven calculator model. General calculators are defined and dispatched from [`data/calculators.ts`](data/calculators.ts). The scientific experience lives in [`components/calculator/ScientificCalculator.tsx`](components/calculator/ScientificCalculator.tsx), while graph expressions are parsed by [`utils/mathParser.ts`](utils/mathParser.ts) and rendered by [`components/GraphingView.tsx`](components/GraphingView.tsx).
+
+```text
+app/                  Product routes, layouts, and API handlers
+components/           Shared product views and calculator UI
+data/                 Calculator registry and guide content
+lib/                  App context, email, tokens, database, and models
+utils/                Formatting, validation, and math utilities
+tests/                Automated tests
+types/                Global and NextAuth type extensions
+```
+
+## Application Routes
+
+| Route | Product surface |
 | --- | --- |
 | `/` | Home dashboard and calculator discovery |
-| `/calculators` | Complete calculator directory |
-| `/calculators/[id]` | Calculator workspace with formula, example, and FAQ content |
+| `/calculators` | Full calculator directory |
+| `/calculators/[id]` | Individual calculator workspace |
 | `/guides` | Strategy and educational guides |
 | `/about` | Product information |
 | `/faq` | Frequently asked questions |
 | `/auth` | Sign in, sign up, and Google sign-in |
 | `/profile` | Profile, security, favorites, history, and saved workspace |
-| `/forgot-password` | Request a password reset |
-| `/reset-password?token=...` | Set a new password from a reset link |
+| `/forgot-password` | Password-reset request |
+| `/reset-password?token=...` | Password-reset completion |
 | `/verify-email` | Email verification status |
 | `/privacy` | Privacy and cookie preferences |
 | `/terms` | Terms of service |
-
-## Technology
-
-- Next.js App Router 16
-- React 19 and TypeScript
-- Tailwind CSS and PostCSS
-- MongoDB with Mongoose
-- NextAuth with credentials and Google providers
-- Nodemailer for verification and password-reset email
-- `bcryptjs` for password hashing
-- `react-hook-form` and Zod for form handling and validation
-- Motion and Lucide React for interaction and UI details
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js compatible with the versions supported by the installed Next.js release
-- npm
-- MongoDB for account and workspace features
-
-### Install
-
-```bash
-npm ci
-```
-
-Create a local environment file at `.env.local` using the variables below, then start the development server:
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Environment Variables
-
-The application reads the following variables:
-
-```env
-MONGODB_URI=mongodb://127.0.0.1:27017/metricores
-NEXTAUTH_SECRET=replace-with-a-long-random-secret
-NEXTAUTH_URL=http://localhost:3000
-
-# Required for Google sign-in
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-# Required to send verification and password-reset email
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-SMTP_FROM=
-```
-
-The email implementation also accepts the aliases `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM`. When SMTP is not configured during development, email links are logged instead of sent. Configure a real SMTP provider for production. Never commit `.env.local` or expose any secret to the client.
-
-## Available Commands
-
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the development server on port 3000 |
-| `npm run build` | Create a production build |
-| `npm start` | Start the production server on port 3000 |
-| `npm run lint` | Run the TypeScript compiler with `--noEmit` |
-| `npx tsx --test tests/password-validation.test.ts` | Run the currently available password-validation test |
-
-There is no dedicated `npm test` script at present.
-
-## Authentication and Workspace
-
-Credentials accounts are stored in MongoDB with bcrypt-hashed passwords. New credentials users must verify their email before signing in. Verification links expire after 24 hours; password-reset links expire after one hour. Verification and password-reset requests are rate-limited.
-
-Google accounts are created or updated on first sign-in and are marked as verified. Sessions use NextAuth JWTs. Authenticated users can update profile details, manage passwords, save calculations, mark favorites, and review workspace history.
-
-Guest calculator usage is tracked in browser `localStorage`. Authenticated workspace data is stored on the user document, with server-side caps for saved calculations and history. Client-only state also includes cookie preferences and scientific-calculator history.
 
 ## API Surface
 
@@ -147,28 +137,96 @@ Guest calculator usage is tracked in browser `localStorage`. Authenticated works
 - `PUT /api/user/password` - Change or set a password
 - `GET|POST|DELETE /api/user/workspace` - Read and mutate saved workspace data
 
-## Project Structure
+## Local Development
 
-```text
-app/                  Next.js routes, pages, layouts, and API handlers
-components/           Shared views and calculator UI components
-data/                 Calculator registry and static guide content
-lib/                  Context, email, tokens, database connection, and models
-utils/                Formatting, class-name, password, and math-parser utilities
-tests/                Automated tests
-types/                Global and NextAuth type extensions
+### Prerequisites
+
+- Node.js compatible with the installed Next.js release
+- npm
+- MongoDB for authentication and workspace features
+
+### Installation
+
+```bash
+npm ci
 ```
 
-The global providers are composed in [`app/layout.tsx`](app/layout.tsx). MongoDB connection and the user model are defined in [`lib/db/connect.ts`](lib/db/connect.ts) and [`lib/db/models/User.ts`](lib/db/models/User.ts).
+Create `.env.local` in the project root, then start the development server:
 
-## Important Notes
+```bash
+npm run dev
+```
 
-- Tax calculations are simplified estimates and are not tax advice.
-- Financial calculators are planning aids; results do not include every lender, tax, insurance, fee, or jurisdiction-specific condition.
-- No database migration or seed command is included. User data is created through the authentication and workspace APIs.
-- The `lint` script currently performs TypeScript checking rather than ESLint.
-- Production deployment requires secure `NEXTAUTH_SECRET`, a reachable MongoDB deployment, configured OAuth callback URLs, and working SMTP credentials.
+Open [http://localhost:3000](http://localhost:3000).
+
+### Environment Variables
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/metricores
+NEXTAUTH_SECRET=replace-with-a-long-random-secret
+NEXTAUTH_URL=http://localhost:3000
+
+# Google sign-in
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Verification and password-reset email
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+```
+
+The email implementation also accepts `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM`. Without SMTP configuration in development, email links are logged instead of sent. Keep `.env.local` private and never expose secrets to the client.
+
+### Available Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server on port 3000 |
+| `npm run build` | Create a production build |
+| `npm start` | Start the production server on port 3000 |
+| `npm run lint` | Run TypeScript validation with `tsc --noEmit` |
+| `npx tsx --test tests/password-validation.test.ts` | Run the available password-validation test |
+
+## Deployment Readiness
+
+For a production deployment, configure:
+
+1. A managed MongoDB deployment and production `MONGODB_URI`
+2. A strong, private `NEXTAUTH_SECRET`
+3. The public application URL in `NEXTAUTH_URL`
+4. Valid Google OAuth credentials and production callback URLs, if Google sign-in is enabled
+5. A working SMTP provider for verification and password-reset email
+6. HTTPS and secure secret management through the hosting platform
+
+No deployment manifest, database migration system, or seed command is currently included. User records are created through the authentication flow and workspace data is created through the application APIs.
+
+## Security and Data Behavior
+
+- Credentials passwords are hashed with bcrypt before storage.
+- Email verification tokens expire after 24 hours.
+- Password-reset tokens expire after one hour.
+- Verification and password-reset requests are rate-limited.
+- Guest usage, cookie preferences, and scientific-calculator history use browser `localStorage`.
+- Authenticated workspace data is stored with the user record and capped to prevent unbounded history growth.
+
+## Roadmap
+
+The current foundation supports the following natural product extensions:
+
+- Add a curated screenshot gallery and product demo assets
+- Expand calculator coverage based on user demand
+- Add richer amortization and export workflows
+- Introduce shared calculation templates for teams
+- Add automated browser coverage for core calculator and authentication journeys
+- Add production deployment automation, migrations, and seed data where needed
+
+## Important Product Notes
+
+Tax calculations are simplified estimates and are not tax advice. Financial outputs are planning aids and may not include every lender, fee, tax, insurance, or jurisdiction-specific condition. Users should verify material financial decisions with an appropriate professional.
 
 ## License
 
-No license file is currently included in the repository. Confirm the intended distribution terms before publishing or redistributing the project.
+No license file is currently included. Confirm the intended distribution terms before publishing or redistributing the project.
