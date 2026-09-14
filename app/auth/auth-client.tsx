@@ -267,7 +267,7 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center mb-4">
-            <BrandLogo />
+            <BrandLogo className="h-14 md:h-16" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-2">
             {isSignUp ? 'Create your account' : 'Welcome back'}

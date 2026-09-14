@@ -123,14 +123,14 @@ export default function Header({
       }`}
       id="site-header"
     >
-      <div className="relative max-w-[95%] w-[95%] mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between" id="header-container">
+      <div className="relative max-w-[95%] w-[95%] mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-center justify-between" id="header-container">
         {/* Left Side: Brand Logo */}
         <button
           onClick={() => handleTabClick('home')}
-          className="flex items-center text-zinc-900 font-heading font-bold text-base md:text-lg tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
+          className="flex items-center justify-center text-zinc-900 font-heading font-bold text-base md:text-lg tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer h-full"
           id="brand-logo"
         >
-          <BrandLogo />
+          <BrandLogo className="h-9 md:h-11 max-h-[80%]" />
         </button>
 
         {/* Center: Desktop Nav Link bar */}

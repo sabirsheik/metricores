@@ -20,7 +20,7 @@ export default function Footer({ onChangeTab }: FooterProps) {
             className="flex items-center text-zinc-900 font-heading font-bold text-base tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
             id="footer-brand-logo"
           >
-            <BrandLogo />
+            <BrandLogo className="h-12 md:h-14" />
           </button>
           <p className="text-sm text-zinc-600 font-sans leading-7 max-w-sm">
             Metricores delivers enterprise-grade business calculators designed for elite pricing accuracy, personal tax estimation, and commercial real estate projections. Simple, fast, and completely free.

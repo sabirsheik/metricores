@@ -143,7 +143,7 @@ export default function ForgotPasswordClient() {
             transition={{ duration: 0.4 }}
             className="inline-flex items-center gap-2 mb-4"
           >
-            <BrandLogo />
+            <BrandLogo className="h-14 md:h-16" />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}

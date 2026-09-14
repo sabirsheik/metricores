@@ -89,28 +89,14 @@ export const sendVerificationEmail = async (email: string, fullName: string, tok
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     .logo {
-      font-size: 24px;
-      font-weight: 700;
-      color: #0f172a;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
-      gap: 8px;
     }
-    .logo .logo-icon {
-      width: 32px;
-      height: 32px;
-      background-color: #18181b;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .logo span {
-      color: #6366f1;
+    .logo img {
+      height: 40px;
+      width: auto;
+      display: block;
     }
     h1 {
       font-size: 24px;
@@ -163,8 +149,7 @@ export const sendVerificationEmail = async (email: string, fullName: string, tok
   <div class="container">
     <div class="card">
       <div class="logo">
-        <div class="logo-icon">M</div>
-        Metri<span>cores</span>
+        <img src="${process.env.NEXTAUTH_URL}/Logo.png" alt="Metricores" />
       </div>
       <h1>Verify your email address</h1>
       <p>Hi ${fullName},</p>
@@ -223,28 +208,14 @@ export const sendPasswordResetEmail = async (email: string, fullName: string, to
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     .logo {
-      font-size: 24px;
-      font-weight: 700;
-      color: #0f172a;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
-      gap: 8px;
     }
-    .logo .logo-icon {
-      width: 32px;
-      height: 32px;
-      background-color: #18181b;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .logo span {
-      color: #6366f1;
+    .logo img {
+      height: 40px;
+      width: auto;
+      display: block;
     }
     h1 {
       font-size: 24px;
@@ -297,8 +268,7 @@ export const sendPasswordResetEmail = async (email: string, fullName: string, to
   <div class="container">
     <div class="card">
       <div class="logo">
-        <div class="logo-icon">M</div>
-        Metri<span>cores</span>
+        <img src="${process.env.NEXTAUTH_URL}/Logo.png" alt="Metricores" />
       </div>
       <h1>Reset your password</h1>
       <p>Hi ${fullName},</p>

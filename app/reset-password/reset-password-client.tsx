@@ -405,7 +405,7 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <BrandLogo />
+            <BrandLogo className="h-14 md:h-16" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-2">
             Reset password
