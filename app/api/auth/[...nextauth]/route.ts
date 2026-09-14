@@ -5,11 +5,26 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 
-// Debug function for consistent logging
-const debug = (message: string, ...data: any[]) => {
-  console.log(`[NextAuth] ${message}`, ...data.map(d => 
-    typeof d === 'object' ? JSON.stringify(d, null, 2) : d
-  ));
+const debug = (message: string, ...data: unknown[]) => {
+  if (process.env.NODE_ENV !== 'development') return;
+
+  const sanitized = data.map((entry) => {
+    if (!entry || typeof entry !== 'object') return entry;
+    if (entry instanceof Error) return { name: entry.name, message: entry.message };
+
+    const obj = entry as Record<string, unknown>;
+    const redacted: Record<string, unknown> = { ...obj };
+
+    for (const key of ['password', 'token', 'secret', 'authorization', 'email']) {
+      if (typeof redacted[key] === 'string') {
+        redacted[key] = '[redacted]';
+      }
+    }
+
+    return redacted;
+  });
+
+  console.log(`[NextAuth] ${message}`, ...sanitized);
 };
 
 function getProviderImage(profile: any, user: any): string | undefined {
