@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Zap, ArrowUpRight, Calculator, Landmark, BriefcaseBusiness } from 'lucide-react';
+import { Search, Zap, ArrowUpRight, Calculator, Landmark, BriefcaseBusiness, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
 import { calculatorsData } from '@/data/calculators';
 import { calcIcons } from './CalculatorView';
@@ -16,12 +16,14 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
   const calcs = Object.values(calculatorsData);
 
   // Extract all unique categories
-  const categories = ['All', 'Basic Mathematics', 'Financial Mathematics', 'Practical Mathematics'];
+  const categories = ['All', 'Basic Mathematics', 'Financial Mathematics', 'Personal Finance', 'Practical Mathematics', 'Planning / Everyday'];
   const categoryLabels: Record<string, string> = {
     All: 'ALL',
     'Basic Mathematics': 'BASIC',
     'Financial Mathematics': 'FINANCIAL',
-    'Practical Mathematics': 'PRACTICAL'
+    'Personal Finance': 'PERSONAL FINANCE',
+    'Practical Mathematics': 'PRACTICAL',
+    'Planning / Everyday': 'PLANNING'
   };
 
   // Sync category & search from URL hash if provided
@@ -61,7 +63,8 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
   const filteredCalcs = calcs.filter((c) => {
     const matchesSearch =
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
+      c.shortDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.keywords?.some((keyword) => keyword.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategory === 'All' || c.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -91,10 +94,24 @@ export default function CalculatorsDirectory({ onSelectCalculator }: Calculators
       accent: 'directory-section-finance'
     },
     {
+      name: 'Personal Finance',
+      label: 'PERSONAL FINANCE',
+      description: 'Plan home equity and household financial decisions.',
+      icon: Landmark,
+      accent: 'directory-section-finance'
+    },
+    {
       name: 'Practical Mathematics',
       label: 'PRACTICAL',
       description: 'Useful answers for real-world calculations.',
       icon: BriefcaseBusiness,
+      accent: 'directory-section-practical'
+    },
+    {
+      name: 'Planning / Everyday',
+      label: 'PLANNING',
+      description: 'Everyday tools for dates, timelines, and planning.',
+      icon: Calendar,
       accent: 'directory-section-practical'
     }
   ];

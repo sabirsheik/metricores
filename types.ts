@@ -2,11 +2,13 @@ export type CalculatorId =
   | 'scientific'
   | 'graphing'
   | 'mortgage'
+  | 'reverse-mortgage'
   | 'loan'
   | 'tax'
   | 'interest'
   | 'payment'
   | 'time'
+  | 'age'
   | 'profit-margin'
   | 'roi'
   | 'percentage'
@@ -24,6 +26,8 @@ export interface InputField {
   step?: number;
   prefix?: string;
   suffix?: string;
+  minDate?: string | (() => string);
+  maxDate?: string | (() => string);
   placeholder?: string;
   options?: { label: string; value: string }[];
   tooltip?: string;
@@ -48,7 +52,8 @@ export interface CalculatorSchema {
   id: CalculatorId;
   name: string;
   shortDescription: string;
-  category: 'Financial Mathematics' | 'Practical Mathematics' | 'Basic Mathematics';
+  category: 'Financial Mathematics' | 'Personal Finance' | 'Practical Mathematics' | 'Basic Mathematics' | 'Planning / Everyday';
+  keywords?: string[];
   lastUpdated: string;
   inputs: InputField[];
   formula: {

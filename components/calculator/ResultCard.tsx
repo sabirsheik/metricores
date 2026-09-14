@@ -103,7 +103,7 @@ Verified mathematically. All calculations are compliant with standard corporate 
         <div className="flex flex-col h-full justify-between space-y-6" id="results-active-state">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-100 pb-3" id="results-header">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400 font-sans">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-600 font-sans">
               Calculation Results
             </h2>
             <div className="flex space-x-1.5 print:hidden" id="results-tools">
@@ -138,7 +138,7 @@ Verified mathematically. All calculations are compliant with standard corporate 
               className="bg-zinc-50/50 p-5 rounded-sm border border-zinc-200/60 flex flex-col space-y-1 relative overflow-hidden"
               id="primary-result-box"
             >
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 font-sans">
+              <span className="text-sm font-bold uppercase tracking-wider text-zinc-600 font-sans">
                 {primaryResult.label}
               </span>
               <span className="text-3xl md:text-4.5xl font-extrabold text-zinc-950 font-mono tracking-tight leading-none break-all py-1">
@@ -156,10 +156,10 @@ Verified mathematically. All calculations are compliant with standard corporate 
                    className="flex items-center justify-between py-2.5 border-b border-zinc-100 last:border-0"
                    id={`secondary-row-${res.id}`}
                 >
-                  <span className="text-xs font-semibold text-zinc-500 font-sans">
+                  <span className="text-sm font-semibold text-zinc-700 font-sans">
                     {res.label}
                   </span>
-                  <span className="text-xs sm:text-sm font-bold text-zinc-800 font-mono">
+                  <span className="text-sm sm:text-base font-bold text-zinc-900 font-mono">
                     {formatResult(res)}
                   </span>
                 </div>
@@ -183,10 +183,10 @@ Verified mathematically. All calculations are compliant with standard corporate 
                 const val = inputs[i.id];
                 return (
                   <div key={i.id} className="flex flex-col space-y-0.5">
-                    <span className="text-xs text-zinc-400 font-sans">
+                    <span className="text-sm text-zinc-500 font-sans">
                       {i.label}
                     </span>
-                    <span className="text-xs font-semibold text-zinc-700 font-mono">
+                    <span className="text-sm font-semibold text-zinc-800 font-mono">
                       {i.prefix || ''}
                       {val !== undefined && val !== '' ? val : '0'}
                       {i.suffix || ''}
@@ -199,7 +199,7 @@ Verified mathematically. All calculations are compliant with standard corporate 
  
           {/* Legal Disclaimer */}
           <div
-            className="pt-4 border-t border-zinc-100 text-[10px] text-zinc-400 font-sans leading-relaxed"
+            className="pt-4 border-t border-zinc-100 text-xs text-zinc-500 font-sans leading-6"
             id="results-disclaimer"
           >
             Estimates provided for planning. Compliant with standard financial formulas. All figures processed inside client browser.

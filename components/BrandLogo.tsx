@@ -1,11 +1,11 @@
 export default function BrandLogo({ showText = true }: { showText?: boolean }) {
   return (
-    <span className="inline-flex items-center space-x-3">
-      <span className="inline-flex w-8 h-8 rounded-xl bg-zinc-950 items-center justify-center text-white text-sm font-mono font-bold tracking-tighter shadow-sm">
+    <span className="brand-logo inline-flex items-center gap-3">
+      <span className="brand-mark inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-zinc-950 text-white font-sans text-base font-extrabold leading-none tracking-normal antialiased shadow-sm">
         M
       </span>
       {showText && (
-        <span className="font-semibold tracking-tight text-zinc-900 text-sm md:text-base">
+        <span className="font-sans text-base font-bold leading-none tracking-tight text-zinc-900 md:text-lg">
           Metricores
         </span>
       )}

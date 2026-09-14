@@ -1,4 +1,6 @@
 import { CalculatorSchema, CalculatorId, ResultField } from '@/types';
+import { calculateAge, getDateYearsAgoString, getTodayDateString } from '@/utils/age';
+import { calculateReverseMortgage } from '@/utils/reverseMortgage';
 
 export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   scientific: {
@@ -144,6 +146,140 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
       {
         question: 'What does a mortgage payment typically include?',
         answer: 'A standard mortgage payment consists of Principal and Interest (P&I). Depending on your setup, it might also bundle property taxes, homeowners insurance, and HOA fees into an escrow account.'
+      }
+    ]
+  },
+  'reverse-mortgage': {
+    id: 'reverse-mortgage',
+    name: 'Reverse Mortgage Calculator',
+    shortDescription: 'See how much cash you may receive and how your home equity could change over time.',
+    category: 'Personal Finance',
+    keywords: ['reverse mortgage calculator', 'reverse mortgage estimate', 'reverse mortgage proceeds', 'home equity', 'reverse mortgage balance', 'reverse mortgage interest', 'remaining home equity'],
+    lastUpdated: 'September 2026',
+    inputs: [
+      {
+        id: 'homeValue',
+        label: 'Estimated Home Value',
+        type: 'number',
+        defaultValue: 500000,
+        min: 1,
+        prefix: '$',
+        placeholder: 'e.g., 500,000',
+        tooltip: 'A reasonable estimate of what your home could sell for today.'
+      },
+      {
+        id: 'mortgageBalance',
+        label: 'Mortgage Balance to Pay Off',
+        type: 'number',
+        defaultValue: 75000,
+        min: 0,
+        prefix: '$',
+        placeholder: 'e.g., 75,000',
+        tooltip: 'What you still owe on your current mortgage or other home lien.'
+      },
+      {
+        id: 'borrowerAge',
+        label: 'Youngest Homeowner Age',
+        type: 'number',
+        defaultValue: 68,
+        min: 62,
+        max: 100,
+        step: 1,
+        suffix: ' years',
+        placeholder: 'e.g., 68',
+        tooltip: 'For a couple, enter the age of the younger homeowner. Many US reverse mortgage programs start at age 62.'
+      },
+      {
+        id: 'interestRate',
+        label: 'Estimated Interest Rate',
+        type: 'number',
+        defaultValue: 6.5,
+        min: 0,
+        max: 20,
+        step: 0.01,
+        suffix: '%',
+        placeholder: 'e.g., 6.50',
+        tooltip: 'An estimated annual rate used to show how the loan balance could grow. Your lender may quote a different rate.'
+      },
+      {
+        id: 'loanTerm',
+        label: 'Years to Project',
+        type: 'number',
+        defaultValue: 15,
+        min: 1,
+        max: 30,
+        step: 1,
+        suffix: ' years',
+        placeholder: 'e.g., 15',
+        tooltip: 'How many years you want to see in the balance and equity estimate.'
+      },
+      {
+        id: 'closingCosts',
+        label: 'Estimated Upfront Costs',
+        type: 'number',
+        defaultValue: 10000,
+        min: 0,
+        prefix: '$',
+        placeholder: 'e.g., 10,000',
+        tooltip: 'Estimated fees and costs at closing. Actual costs vary by lender, loan program, and location.'
+      },
+      {
+        id: 'initialAdvance',
+        label: 'Cash You Want at Closing',
+        type: 'number',
+        defaultValue: 50000,
+        min: 0,
+        prefix: '$',
+        placeholder: 'e.g., 50,000',
+        tooltip: 'The amount you would like to receive upfront. The estimate may reduce this if the available amount is lower.'
+      }
+    ],
+    formula: {
+      equation: 'Estimated borrowing amount = Home value x age and rate factors',
+      description: 'This educational estimate accounts for your home value, age, estimated rate, current mortgage, and upfront costs, then shows how the balance could grow over time.',
+      steps: [
+        'Estimate your home equity by subtracting your current mortgage from your home value.',
+        'Estimate a borrowing amount using the youngest homeowner age and interest-rate assumption.',
+        'Set aside the current mortgage payoff and estimated upfront costs.',
+        'Project the loan balance and remaining home equity year by year.'
+      ]
+    },
+    example: {
+      scenario: 'Example only - not a lending offer or financial advice. A 68-year-old homeowner has a $500,000 home, a $75,000 mortgage, a 6.5% planning rate, $10,000 in estimated costs, and requests a $50,000 initial advance over 15 years.',
+      explanation: 'The model estimates available equity, an illustrative borrowing capacity, net initial proceeds, projected interest, and remaining equity. Actual lender-approved results depend on the product, property, insurance, fees, and underwriting.'
+    },
+    faqs: [
+      {
+        question: 'What is a reverse mortgage?',
+        answer: 'A reverse mortgage is a loan secured by home equity that can provide eligible homeowners with proceeds while they remain responsible for property charges and loan obligations.'
+      },
+      {
+        question: 'How much can I borrow with a reverse mortgage?',
+        answer: 'The amount depends on age, home value, existing liens, interest rate, loan program, property requirements, and lender limits. This calculator provides an illustrative estimate only.'
+      },
+      {
+        question: 'Does a reverse mortgage affect home ownership?',
+        answer: 'The borrower generally remains the owner, but the loan is secured by the property and must be repaid when the loan becomes due under its terms.'
+      },
+      {
+        question: 'How does interest affect the balance?',
+        answer: 'When interest is not paid from another source, it can be added to the outstanding balance over time, reducing remaining equity.'
+      },
+      {
+        question: 'What happens to an existing mortgage?',
+        answer: 'An existing mortgage or lien commonly needs to be paid or otherwise addressed at closing. This estimate subtracts the entered balance from available proceeds.'
+      },
+      {
+        question: 'Does a reverse mortgage reduce home equity?',
+        answer: 'It can. The balance, interest, and applicable costs may grow over time, which can reduce the equity available to the homeowner or estate.'
+      },
+      {
+        question: 'Are these reverse mortgage calculations exact?',
+        answer: 'No. The model is educational and deterministic, but actual products use program-specific principal-limit tables, fees, insurance, taxes, underwriting, and legal requirements.'
+      },
+      {
+        question: 'Is this calculator financial advice?',
+        answer: 'No. It is an informational planning tool, not a lender quote, approval, offer, or substitute for advice from a qualified housing or financial professional.'
       }
     ]
   },
@@ -528,6 +664,59 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
       {
         question: 'Does this calculator include public holidays?',
         answer: 'No, public holidays vary heavily by region and industry. This calculator strictly filters weekends unless configured otherwise.'
+      }
+    ]
+  },
+  age: {
+    id: 'age',
+    name: 'Age Calculator',
+    shortDescription: 'Calculate exact age in years, months, and days from a date of birth.',
+    category: 'Planning / Everyday',
+    keywords: ['age calculator', 'exact age calculator', 'calculate age', 'date of birth calculator', 'age in years months and days'],
+    lastUpdated: 'September 2026',
+    inputs: [
+      {
+        id: 'dateOfBirth',
+        label: 'Date of Birth',
+        type: 'date',
+        defaultValue: () => getDateYearsAgoString(30),
+        maxDate: () => getTodayDateString(),
+        tooltip: 'Enter the person\'s date of birth. Future birth dates are not accepted.'
+      },
+      {
+        id: 'calculationDate',
+        label: 'Calculate As Of',
+        type: 'date',
+        defaultValue: () => getTodayDateString(),
+        tooltip: 'Choose today or another date for a historical or future age calculation.'
+      }
+    ],
+    formula: {
+      equation: 'Exact age = calendar difference between Date of Birth and Calculation Date',
+      description: 'Age is calculated using calendar years, months, and days rather than a fixed number of days per year.',
+      steps: [
+        'Validate both dates as real calendar dates and confirm the calculation date is not before the date of birth.',
+        'Count completed calendar years, treating February 29 birthdays as February 28 in non-leap years.',
+        'Calculate the remaining months and days using the actual length of each calendar month.',
+        'Calculate supporting totals such as elapsed days, weeks, next birthday, and days remaining.'
+      ]
+    },
+    example: {
+      scenario: 'A person born on January 15, 1995, calculated as of September 14, 2026.',
+      explanation: 'The calculator returns the exact calendar age as 31 Years, 7 Months, 30 Days, together with total elapsed time and the next birthday.'
+    },
+    faqs: [
+      {
+        question: 'Does the calculator account for leap years?',
+        answer: 'Yes. It uses the actual calendar length of every month and recognizes February 29 in leap years.'
+      },
+      {
+        question: 'How are February 29 birthdays handled?',
+        answer: 'In non-leap years, February 28 is used as the birthday anniversary so the completed age remains calendar-consistent.'
+      },
+      {
+        question: 'Can I calculate age on a past or future date?',
+        answer: 'Yes. Select any calculation date on or after the date of birth to review historical or projected age.'
       }
     ]
   },
@@ -961,6 +1150,33 @@ export function calculate(id: CalculatorId, inputs: Record<string, any>): Result
       ];
     }
 
+    case 'reverse-mortgage': {
+      const estimate = calculateReverseMortgage({
+        homeValue: Number(inputs.homeValue || 0),
+        mortgageBalance: Number(inputs.mortgageBalance || 0),
+        borrowerAge: Number(inputs.borrowerAge || 0),
+        interestRate: Number(inputs.interestRate || 0),
+        loanTerm: Number(inputs.loanTerm || 0),
+        closingCosts: Number(inputs.closingCosts || 0),
+        initialAdvance: Number(inputs.initialAdvance || 0)
+      });
+
+      return [
+        { id: 'estimatedProceeds', label: 'Estimated Reverse Mortgage Proceeds', value: estimate.estimatedProceeds, isPrimary: true, format: 'currency' },
+        { id: 'availableEquity', label: 'Estimated Available Equity', value: estimate.availableEquity, format: 'currency' },
+        { id: 'mortgagePayoff', label: 'Existing Mortgage Payoff', value: estimate.mortgagePayoff, format: 'currency' },
+        { id: 'netEquityAfterMortgage', label: 'Net Equity After Mortgage and Costs', value: estimate.netEquityAfterMortgage, format: 'currency' },
+        { id: 'borrowingCapacity', label: 'Illustrative Borrowing Capacity', value: estimate.borrowingCapacity, format: 'currency' },
+        { id: 'initialAdvance', label: 'Estimated Initial Advance', value: estimate.initialAdvance, format: 'currency' },
+        { id: 'estimatedRemainingEquity', label: 'Estimated Remaining Equity', value: estimate.estimatedRemainingEquity, format: 'currency' },
+        { id: 'estimatedLoanBalance', label: 'Estimated Loan Balance', value: estimate.estimatedLoanBalance, format: 'currency' },
+        { id: 'estimatedInterest', label: 'Estimated Interest Accumulation', value: estimate.estimatedInterest, format: 'currency' },
+        { id: 'estimatedRepayment', label: 'Estimated Total Repayment Balance', value: estimate.estimatedRepayment, format: 'currency' },
+        { id: 'principalLimitFactor', label: 'Illustrative Age/Rate Factor', value: estimate.principalLimitFactor * 100, format: 'percent' },
+        { id: 'projectionSummary', label: 'Projection', value: `${inputs.loanTerm} years at the entered planning rate`, format: 'text' }
+      ];
+    }
+
     case 'loan': {
       const loanAmount = Number(inputs.loanAmount || 0);
       const interestRate = Number(inputs.interestRate || 0);
@@ -1228,6 +1444,28 @@ export function calculate(id: CalculatorId, inputs: Record<string, any>): Result
           { id: 'calendarOffset', label: 'Offset Duration', value: `${Math.abs(days)} calendar-adjusted days`, format: 'text' }
         ];
       }
+    }
+
+    case 'age': {
+      const age = calculateAge(inputs.dateOfBirth, inputs.calculationDate);
+
+      return [
+        {
+          id: 'exactAge',
+          label: 'Your Exact Age',
+          value: `${age.years} Years, ${age.months} Months, ${age.days} Days`,
+          isPrimary: true,
+          format: 'text'
+        },
+        { id: 'totalYears', label: 'Total Years', value: age.totalYears, format: 'number', suffix: ' years' },
+        { id: 'totalMonths', label: 'Total Months', value: age.totalMonths, format: 'number', suffix: ' months' },
+        { id: 'totalWeeks', label: 'Total Weeks', value: age.totalWeeks, format: 'number', suffix: ' weeks' },
+        { id: 'totalDays', label: 'Total Days', value: age.totalDays, format: 'number', suffix: ' days' },
+        { id: 'nextBirthday', label: 'Next Birthday', value: age.nextBirthday, format: 'text' },
+        { id: 'daysUntilNextBirthday', label: 'Days Until Next Birthday', value: age.daysUntilNextBirthday, format: 'number', suffix: ' days' },
+        { id: 'dayOfBirth', label: 'Day of Birth', value: age.dayOfBirth, format: 'text' },
+        { id: 'ageStatus', label: 'Age Status', value: age.status, format: 'text' }
+      ];
     }
 
     case 'profit-margin': {

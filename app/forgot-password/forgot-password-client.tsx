@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Mail, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
+import BrandLogo from '@/components/BrandLogo';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -142,9 +143,7 @@ export default function ForgotPasswordClient() {
             transition={{ duration: 0.4 }}
             className="inline-flex items-center gap-2 mb-4"
           >
-            <div className="w-10 h-10 rounded-lg bg-zinc-950 flex items-center justify-center">
-              <span className="text-white text-sm font-bold font-mono">M</span>
-            </div>
+            <BrandLogo />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}

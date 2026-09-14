@@ -20,16 +20,20 @@ Most calculator sites are built around isolated one-off tools. Metricores is str
 
 ### Calculator Workspace
 
-The core directory includes 14 calculators for financial planning, business analysis, mathematics, and everyday decisions.
+The core directory includes 16 calculators for financial planning, business analysis, mathematics, and everyday decisions.
 
 | Area | Included tools |
 | --- | --- |
 | Mathematics | Scientific, Graphing, Percentage |
-| Personal finance | Mortgage, Loan, Interest, Payment, ROI, Discount, Tip, VAT |
+| Personal finance | Mortgage, Reverse Mortgage, Loan, Interest, Payment, ROI, Discount, Tip, VAT |
 | Business analysis | Profit Margin |
-| Planning | Tax, Time |
+| Planning and everyday | Tax, Time, Age |
 
 The scientific calculator supports DEG/RAD modes, trigonometric and logarithmic functions, exponentials, factorials, memory operations, keyboard input, and local history. The graphing calculator supports multiple expressions, real-time parsing, pan and zoom, grid and axis controls, presets, themes, fullscreen mode, and downloadable output.
+
+The Age Calculator calculates exact age in calendar-aware years, months, and days, including leap years, February 29 birthdays, month-end dates, next birthday timing, and total elapsed time.
+
+The Reverse Mortgage Calculator provides an illustrative estimate of home equity, potential proceeds, balance growth, interest accumulation, repayment balance, and remaining equity. It is not a lender quote or financial advice; actual reverse mortgage products use program-specific eligibility, fees, insurance, limits, and underwriting.
 
 ### Guides and Education
 

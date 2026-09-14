@@ -10,7 +10,9 @@ interface InputFieldProps {
 }
 
 export default function InputField({ field, value, onChange, error }: InputFieldProps) {
-  const { id, label, type, min, max, step, prefix, suffix, placeholder, options, tooltip } = field;
+  const { id, label, type, min, max, step, prefix, suffix, minDate, maxDate, placeholder, options, tooltip } = field;
+  const resolvedMinDate = typeof minDate === 'function' ? minDate() : minDate;
+  const resolvedMaxDate = typeof maxDate === 'function' ? maxDate() : maxDate;
 
   // Handle number changing safely
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,11 +28,11 @@ export default function InputField({ field, value, onChange, error }: InputField
   const hasRangeSlider = type === 'number' && min !== undefined && max !== undefined;
 
   return (
-    <div className="space-y-1.5" id={`input-container-${id}`}>
+    <div className="space-y-2" id={`input-container-${id}`}>
       <div className="flex items-center justify-between">
         <label
           htmlFor={id}
-          className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5"
+          className="text-sm font-semibold text-zinc-800 flex items-center gap-1.5"
           id={`label-${id}`}
         >
           {label}
@@ -44,7 +46,7 @@ export default function InputField({ field, value, onChange, error }: InputField
           )}
         </label>
         {error && (
-          <span className="text-[10px] font-semibold text-red-600 font-sans" id={`error-${id}`}>
+          <span className="text-xs font-semibold text-red-700 font-sans" id={`error-${id}`}>
             {error}
           </span>
         )}
@@ -70,7 +72,7 @@ export default function InputField({ field, value, onChange, error }: InputField
               step={step || 'any'}
               aria-invalid={!!error}
               aria-describedby={error ? `error-${id}` : undefined}
-              className={`w-full py-2 pl-${prefix ? '8' : '3'} pr-${suffix ? '8' : '3'} bg-white border ${
+              className={`w-full min-h-11 py-2.5 pl-${prefix ? '8' : '3'} pr-${suffix ? '8' : '3'} bg-white border ${
                 error
                   ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
                   : 'border-zinc-200 focus:ring-zinc-950/20 focus:border-zinc-950'
@@ -109,10 +111,12 @@ export default function InputField({ field, value, onChange, error }: InputField
           type="date"
           id={id}
           value={value || ''}
+          min={resolvedMinDate}
+          max={resolvedMaxDate}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={!!error}
           aria-describedby={error ? `error-${id}` : undefined}
-          className={`w-full py-2 px-3 bg-white border ${
+          className={`w-full min-h-11 py-2.5 px-3 bg-white border ${
             error
               ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
               : 'border-zinc-200 focus:ring-zinc-950/20 focus:border-zinc-950'

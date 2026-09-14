@@ -10,31 +10,31 @@ interface ExampleSectionProps {
 export default function ExampleSection({ example }: ExampleSectionProps) {
   return (
     <div
-      className="bg-white border border-zinc-200 rounded-sm p-5 md:p-6 shadow-2xs"
+      className="bg-white border border-zinc-200 rounded-sm p-6 md:p-7 shadow-2xs"
       id="example-card"
     >
-      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 font-sans block mb-1">
+      <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 font-sans block mb-2">
         Case Study
       </span>
-      <h2 className="text-sm font-bold text-zinc-900 font-heading mb-3">
+      <h2 className="text-lg font-bold text-zinc-900 font-heading mb-4">
         Real Business Example
       </h2>
       <div className="space-y-4" id="example-details">
         <div className="flex items-start" id="example-scenario">
           <div className="border-l-2 border-zinc-950 pl-3 py-1">
-            <h3 className="text-[10px] font-bold text-zinc-400 uppercase font-sans tracking-wide">
+            <h3 className="text-xs font-bold text-zinc-500 uppercase font-sans tracking-wide">
               Scenario
             </h3>
-            <p className="text-xs text-zinc-500 font-sans leading-relaxed mt-1 italic">
+            <p className="text-sm text-zinc-600 font-sans leading-7 mt-2 italic">
               "{example.scenario}"
             </p>
           </div>
         </div>
         <div>
-          <h3 className="text-[10px] font-bold text-zinc-400 uppercase font-sans tracking-wide">
+          <h3 className="text-xs font-bold text-zinc-500 uppercase font-sans tracking-wide">
             Business Explanation
           </h3>
-          <p className="text-xs text-zinc-600 font-sans leading-relaxed mt-1">
+          <p className="text-sm text-zinc-700 font-sans leading-7 mt-2">
             {example.explanation}
           </p>
         </div>

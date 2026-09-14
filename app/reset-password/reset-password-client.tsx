@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
+import BrandLogo from '@/components/BrandLogo';
 import { validatePassword } from '@/utils/password';
 
 const resetPasswordSchema = z
@@ -404,9 +405,7 @@ export default function ResetPasswordClient({ searchParams }: ResetPasswordClien
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-zinc-950 flex items-center justify-center">
-              <span className="text-white text-sm font-bold font-mono">M</span>
-            </div>
+            <BrandLogo />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-2">
             Reset password

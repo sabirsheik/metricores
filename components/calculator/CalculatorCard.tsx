@@ -49,6 +49,8 @@ import FAQSection from './FAQSection';
 import { useToast } from './Toast';
 import { CalculatorCardSkeleton, ResultCardSkeleton } from '../ui/Skeleton';
 import { formatCurrency, formatPercentage, formatNumber, formatDate } from '@/utils/format';
+import { compareCivilDates, getTodayDateString, parseCivilDate } from '@/utils/age';
+import { calculateReverseMortgage } from '@/utils/reverseMortgage';
 import ScientificCalculator from './ScientificCalculator';
 
 // Icon mapping for calculators
@@ -56,11 +58,13 @@ export const calcIcons: Record<string, any> = {
   scientific: Calculator,
   graphing: TrendingUp,
   mortgage: HomeIcon,
+  'reverse-mortgage': HomeIcon,
   loan: Percent,
   tax: FileText,
   interest: TrendingUp,
   payment: CreditCard,
   time: Clock,
+  age: Calendar,
   'profit-margin': Scale,
   roi: Award,
   percentage: Percent,
@@ -97,6 +101,16 @@ export default function CalculatorCard({
   const [saveName, setSaveName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const getDefaultInputs = () => {
+    const defaultInputs: Record<string, any> = {};
+    calculator.inputs.forEach((field) => {
+      defaultInputs[field.id] = typeof field.defaultValue === 'function'
+        ? field.defaultValue()
+        : field.defaultValue;
+    });
+    return defaultInputs;
+  };
+
   useEffect(() => {
     if (!session?.user || calculator.id === 'scientific') return;
     fetch('/api/user/workspace')
@@ -108,10 +122,7 @@ export default function CalculatorCard({
   // Sync parameters and run initial calculation on mount / calculator swap
   useEffect(() => {
     setIsPageLoading(true);
-    const defaultInputs: Record<string, any> = {};
-    calculator.inputs.forEach((field) => {
-      defaultInputs[field.id] = field.defaultValue;
-    });
+    const defaultInputs = getDefaultInputs();
     let restoredInputs = defaultInputs;
     let restoredResults: ResultField[] | null = null;
     try {
@@ -190,6 +201,39 @@ export default function CalculatorCard({
         }
       }
     });
+
+    if (calculator.id === 'age') {
+      const dateOfBirth = parseCivilDate(inputs.dateOfBirth);
+      const calculationDate = parseCivilDate(inputs.calculationDate);
+      const today = parseCivilDate(getTodayDateString());
+
+      if (dateOfBirth && today && compareCivilDates(dateOfBirth, today) > 0) {
+        newErrors.dateOfBirth = 'Date of birth cannot be in the future.';
+      }
+      if (inputs.dateOfBirth && !dateOfBirth) {
+        newErrors.dateOfBirth = 'Enter a valid date of birth.';
+      }
+      if (inputs.calculationDate && !calculationDate) {
+        newErrors.calculationDate = 'Enter a valid calculation date.';
+      }
+      if (dateOfBirth && calculationDate && compareCivilDates(calculationDate, dateOfBirth) < 0) {
+        newErrors.calculationDate = 'Calculation date cannot be earlier than date of birth.';
+      }
+    }
+
+    if (calculator.id === 'reverse-mortgage') {
+      const homeValue = Number(inputs.homeValue || 0);
+      const mortgageBalance = Number(inputs.mortgageBalance || 0);
+      const initialAdvance = Number(inputs.initialAdvance || 0);
+      const closingCosts = Number(inputs.closingCosts || 0);
+
+      if (mortgageBalance > homeValue) {
+        newErrors.mortgageBalance = 'Mortgage balance cannot exceed home value.';
+      }
+      if (initialAdvance + mortgageBalance + closingCosts > homeValue) {
+        newErrors.initialAdvance = 'Advance, mortgage payoff, and costs cannot exceed home value.';
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -286,10 +330,7 @@ export default function CalculatorCard({
   const handleReset = () => {
     setIsResetting(true);
     setTimeout(() => {
-      const defaultInputs: Record<string, any> = {};
-      calculator.inputs.forEach((field) => {
-        defaultInputs[field.id] = field.defaultValue;
-      });
+      const defaultInputs = getDefaultInputs();
       setInputs(defaultInputs);
       setErrors({});
       try {
@@ -369,6 +410,132 @@ export default function CalculatorCard({
     };
 
     switch (calculator.id) {
+      case 'reverse-mortgage': {
+        let estimate;
+        let estimateError = '';
+        try {
+          estimate = calculateReverseMortgage({
+            homeValue: Number(inputs.homeValue || 0),
+            mortgageBalance: Number(inputs.mortgageBalance || 0),
+            borrowerAge: Number(inputs.borrowerAge || 0),
+            interestRate: Number(inputs.interestRate || 0),
+            loanTerm: Number(inputs.loanTerm || 0),
+            closingCosts: Number(inputs.closingCosts || 0),
+            initialAdvance: Number(inputs.initialAdvance || 0)
+          });
+        } catch (error) {
+          estimateError = error instanceof Error ? error.message : 'Please review the entered parameters.';
+        }
+
+        return (
+          <div className="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-5 bg-white border border-zinc-200 rounded-sm p-6 shadow-2xs space-y-6 border-l-4 border-l-sky-600">
+              <div className="border-b border-zinc-100 pb-3">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-sm font-sans">
+                  For US Homeowners
+                </span>
+                <h3 className="text-sm font-bold text-zinc-900 font-heading mt-2">Tell us about your home</h3>
+                <p className="text-[10px] text-zinc-500 leading-relaxed mt-2">Use simple estimates to see how much cash you may receive and what could happen to your home equity over time.</p>
+              </div>
+
+              <div className="space-y-4">
+                {calculator.inputs.map((field) => (
+                  <div key={field.id}>
+                    <InputField field={field} value={inputs[field.id]} onChange={(val) => handleInputChange(field.id, val)} error={errors[field.id]} />
+                  </div>
+                ))}
+              </div>
+
+              <ActionButtons
+                onCalculate={handleCalculate}
+                onReset={handleReset}
+                onClear={handleClear}
+                isCalculating={isCalculating}
+                isResetting={isResetting}
+              />
+            </div>
+
+            <div className="lg:col-span-7 bg-white border border-zinc-200 rounded-sm p-6 shadow-2xs space-y-6">
+              {estimate ? (
+                <>
+              <div className="border-b border-zinc-100 pb-3 flex items-center justify-between gap-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 font-sans flex items-center gap-2">
+                  <HomeIcon className="w-4 h-4 text-zinc-400" />
+                  Your Estimated Results
+                </h3>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-sm">Educational estimate</span>
+              </div>
+
+              <div className="bg-sky-50/40 border border-sky-100 rounded-sm p-5 flex flex-col items-center text-center space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-sky-800">Estimated Cash You Could Receive</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-zinc-950 font-mono tracking-tight">{formatCurrency(estimate.estimatedProceeds, 'USD')}</span>
+                <span className="text-[10px] text-zinc-500">After the current mortgage payoff and estimated upfront costs.</span>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-sm p-4 text-[10px] text-amber-900 leading-relaxed">
+                <strong>How to read this:</strong> A reverse mortgage lets eligible homeowners borrow against home equity, but the loan balance can grow over time. You generally still own the home and remain responsible for property taxes, insurance, maintenance, and other loan requirements.
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  ['Home Equity Before Loan', estimate.availableEquity],
+                  ['Estimated Loan Amount Available', estimate.borrowingCapacity],
+                  ['Mortgage Paid Off', estimate.mortgagePayoff],
+                  ['Estimated Equity After Term', estimate.estimatedRemainingEquity]
+                ].map(([label, value]) => (
+                  <div key={String(label)} className="p-3 bg-zinc-50/60 border border-zinc-200/70 rounded-sm">
+                    <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest block">{label}</span>
+                    <span className="text-base font-bold text-zinc-900 font-mono mt-1 block">{formatCurrency(Number(value), 'USD')}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3 border-t border-zinc-100 pt-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-zinc-700 font-sans">What Could Happen Over Time</h4>
+                  <span className="text-[10px] text-zinc-400 font-mono">Home value is held flat</span>
+                </div>
+                <div className="overflow-x-auto border border-zinc-200 rounded-sm">
+                  <table className="w-full min-w-[520px] text-left text-[10px] font-mono">
+                    <thead className="bg-zinc-50 text-zinc-400 uppercase tracking-wider">
+                      <tr>
+                        <th className="px-3 py-2 font-bold">Year</th>
+                        <th className="px-3 py-2 font-bold">Loan Balance</th>
+                        <th className="px-3 py-2 font-bold">Interest Added</th>
+                        <th className="px-3 py-2 font-bold">Balance After Interest</th>
+                        <th className="px-3 py-2 font-bold">Home Equity Left</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {estimate.projections.map((projection) => (
+                        <tr key={projection.year} className="border-t border-zinc-100 text-zinc-700">
+                          <td className="px-3 py-2">{projection.year}</td>
+                          <td className="px-3 py-2">{formatCurrency(projection.startingBalance, 'USD', 0)}</td>
+                          <td className="px-3 py-2">{formatCurrency(projection.interestAccumulated, 'USD', 0)}</td>
+                          <td className="px-3 py-2 font-semibold">{formatCurrency(projection.endingBalance, 'USD', 0)}</td>
+                          <td className="px-3 py-2">{formatCurrency(projection.remainingEquity, 'USD', 0)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <p className="text-[10px] text-zinc-400 leading-relaxed border-t border-zinc-100 pt-3">This is not a lender quote or financial advice. Actual results depend on the loan program, lender, property, fees, mortgage insurance, taxes, and your ability to meet ongoing requirements.</p>
+                </>
+              ) : (
+                <div className="min-h-64 flex flex-col items-center justify-center text-center gap-3">
+                  <AlertTriangle className="w-6 h-6 text-amber-500" />
+                  <p className="text-sm font-semibold text-zinc-800">Review the reverse mortgage inputs</p>
+                  <p className="max-w-sm text-xs text-zinc-500">{estimateError}</p>
+                  <p className="max-w-sm text-[10px] text-zinc-400">Update the highlighted value, then calculate again to refresh the estimate.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
       case 'mortgage': {
         const homePrice = Number(inputs.homePrice || 0);
         const downPayment = Number(inputs.downPayment || 0);
@@ -1639,7 +1806,9 @@ export default function CalculatorCard({
                       />
                     ) : (
                       <InputField
-                        field={field}
+                        field={calculator.id === 'age' && field.id === 'calculationDate'
+                          ? { ...field, minDate: inputs.dateOfBirth || undefined }
+                          : field}
                         value={inputs[field.id]}
                         onChange={(val) => handleInputChange(field.id, val)}
                         error={errors[field.id]}

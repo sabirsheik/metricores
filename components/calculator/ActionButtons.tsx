@@ -22,7 +22,7 @@ export default function ActionButtons({
         type="button"
         onClick={onCalculate}
         disabled={isCalculating}
-        className="col-span-6 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-900 disabled:bg-zinc-950/70 text-white font-sans text-xs font-medium rounded-sm transition-all duration-150 active:scale-[0.98] shadow-2xs focus:outline-none focus:ring-1 focus:ring-zinc-950/20 flex items-center justify-center gap-1 cursor-pointer"
+        className="col-span-6 min-h-11 py-2.5 px-4 bg-zinc-950 hover:bg-zinc-900 disabled:bg-zinc-950/70 text-white font-sans text-sm font-medium rounded-sm transition-all duration-150 active:scale-[0.98] shadow-2xs focus:outline-none focus:ring-1 focus:ring-zinc-950/20 flex items-center justify-center gap-1 cursor-pointer"
         id="calc-submit-btn"
       >
         {isCalculating ? 'Calculating...' : 'Calculate'}
@@ -33,7 +33,7 @@ export default function ActionButtons({
         type="button"
         onClick={onReset}
         disabled={isResetting}
-        className="col-span-3 py-2.5 px-3 border border-zinc-200 hover:bg-zinc-50 disabled:opacity-50 text-zinc-600 font-sans text-xs font-medium rounded-sm transition-all duration-150 active:scale-[0.98] flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-zinc-950/10 cursor-pointer"
+        className="col-span-3 min-h-11 py-2.5 px-3 border border-zinc-200 hover:bg-zinc-50 disabled:opacity-50 text-zinc-700 font-sans text-sm font-medium rounded-sm transition-all duration-150 active:scale-[0.98] flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-zinc-950/10 cursor-pointer"
         title="Reset to default fields"
         id="calc-reset-btn"
       >
@@ -44,7 +44,7 @@ export default function ActionButtons({
       <button
         type="button"
         onClick={onClear}
-        className="col-span-3 py-2.5 px-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-600 font-sans text-xs font-medium rounded-sm transition-all duration-150 active:scale-[0.98] flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-zinc-950/10 cursor-pointer"
+        className="col-span-3 min-h-11 py-2.5 px-3 border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-sans text-sm font-medium rounded-sm transition-all duration-150 active:scale-[0.98] flex items-center justify-center focus:outline-none focus:ring-1 focus:ring-zinc-950/10 cursor-pointer"
         title="Clear all fields"
         id="calc-clear-btn"
       >

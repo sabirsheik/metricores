@@ -35,7 +35,8 @@ export default function SearchModal({ isOpen, onClose, onSelectCalculator }: Sea
     return (
       calc.name.toLowerCase().includes(query.toLowerCase()) ||
       calc.shortDescription.toLowerCase().includes(query.toLowerCase()) ||
-      calc.category.toLowerCase().includes(query.toLowerCase())
+      calc.category.toLowerCase().includes(query.toLowerCase()) ||
+      calc.keywords?.some((keyword) => keyword.toLowerCase().includes(query.toLowerCase()))
     );
   });
 

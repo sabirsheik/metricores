@@ -9,6 +9,7 @@ import {
   FileText,
   CreditCard,
   Clock,
+  Calendar,
   Scale,
   Award,
   Tag,
@@ -23,15 +24,18 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { calculatorsData } from '@/data/calculators';
+import BrandLogo from './BrandLogo';
 
 const calcIcons: Record<string, any> = {
   graphing: TrendingUp,
   mortgage: HomeIcon,
+  'reverse-mortgage': HomeIcon,
   loan: Percent,
   tax: FileText,
   interest: TrendingUp,
   payment: CreditCard,
   time: Clock,
+  age: Calendar,
   'profit-margin': Scale,
   roi: Award,
   percentage: Percent,
@@ -126,12 +130,7 @@ export default function Header({
           className="flex items-center text-zinc-900 font-heading font-bold text-base md:text-lg tracking-tight select-none focus:outline-none focus:ring-1 focus:ring-zinc-950/10 rounded-sm cursor-pointer"
           id="brand-logo"
         >
-          <span className="inline-flex w-8 h-8 rounded-xl bg-zinc-950 items-center justify-center text-white text-sm font-mono font-bold tracking-tighter shadow-sm">
-            M
-          </span>
-          <span className="font-semibold tracking-tight text-zinc-900 text-sm md:text-base ml-3">
-            Metricores
-          </span>
+          <BrandLogo />
         </button>
 
         {/* Center: Desktop Nav Link bar */}

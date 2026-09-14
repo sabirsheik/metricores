@@ -23,7 +23,8 @@ import {
   CreditCard,
   User,
   Shield,
-  HelpCircle
+  HelpCircle,
+  Calendar
 } from 'lucide-react';
 import { calculatorsData } from '@/data/calculators';
 import { calcIcons } from './CalculatorView';
@@ -38,11 +39,13 @@ interface HomeViewProps {
 // Map custom gradients for the iOS/Desmos-style squircles
 const iconGradients: Record<string, string> = {
   mortgage: 'from-emerald-400 to-teal-500 shadow-teal-100/60',
+  'reverse-mortgage': 'from-teal-400 to-cyan-500 shadow-cyan-100/60',
   loan: 'from-blue-400 to-indigo-500 shadow-blue-100/60',
   tax: 'from-violet-400 to-purple-500 shadow-purple-100/60',
   interest: 'from-rose-400 to-pink-500 shadow-pink-100/60',
   payment: 'from-amber-400 to-orange-500 shadow-orange-100/60',
   time: 'from-sky-400 to-cyan-500 shadow-cyan-100/60',
+  age: 'from-cyan-400 to-blue-500 shadow-blue-100/60',
   'profit-margin': 'from-red-400 to-rose-500 shadow-rose-100/60',
   roi: 'from-fuchsia-400 to-violet-500 shadow-violet-100/60',
   percentage: 'from-indigo-400 to-blue-500 shadow-indigo-100/60',
@@ -54,11 +57,13 @@ const iconGradients: Record<string, string> = {
 // Map labels and descriptions for the app-like tools
 const toolDisplayData: Record<string, { label: string; tag?: string }> = {
   mortgage: { label: 'Mortgage' },
+  'reverse-mortgage': { label: 'Reverse Mortgage' },
   loan: { label: 'Amortize' },
   tax: { label: 'Income Tax', tag: 'UPDATED' },
   interest: { label: 'Compound' },
   payment: { label: 'Debt Payoff' },
   time: { label: 'Date Calc' },
+  age: { label: 'Age' },
   'profit-margin': { label: 'Margins', tag: 'BETA' },
   roi: { label: 'ROI' },
   percentage: { label: 'Percentages' },
@@ -81,9 +86,21 @@ const calculatorSuites = [
     accent: 'directory-section-finance'
   },
   {
+    name: 'Personal Finance',
+    label: 'PERSONAL FINANCE',
+    description: 'Plan home equity and household financial decisions.',
+    accent: 'directory-section-finance'
+  },
+  {
     name: 'Practical Mathematics',
     label: 'PRACTICAL',
     description: 'Useful answers for real-world decisions.',
+    accent: 'directory-section-practical'
+  },
+  {
+    name: 'Planning / Everyday',
+    label: 'PLANNING',
+    description: 'Useful tools for dates and everyday planning.',
     accent: 'directory-section-practical'
   }
 ];

@@ -17,7 +17,7 @@ export default function SelectField({ field, value, onChange, error }: SelectFie
       <div className="flex items-center justify-between">
         <label
           htmlFor={id}
-          className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5"
+          className="text-sm font-semibold text-zinc-800 flex items-center gap-1.5"
           id={`select-label-${id}`}
         >
           {label}
@@ -45,7 +45,7 @@ export default function SelectField({ field, value, onChange, error }: SelectFie
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={!!error}
           aria-describedby={error ? `select-error-${id}` : undefined}
-          className={`w-full py-2 px-3 bg-white border ${
+          className={`w-full min-h-11 py-2.5 px-3 bg-white border ${
             error
               ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500'
               : 'border-zinc-200 focus:ring-zinc-950/20 focus:border-zinc-950'

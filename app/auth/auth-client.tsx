@@ -11,6 +11,7 @@ import { Eye, EyeOff, Mail, Lock, User, Loader2, ArrowRight, AlertCircle, Refres
 import { motion } from 'motion/react';
 import { cn } from '@/utils/cn';
 import { validatePassword } from '@/utils/password';
+import BrandLogo from '@/components/BrandLogo';
 
 const signUpSchema = z
   .object({
@@ -265,10 +266,8 @@ export default function AuthClient({ searchParams }: AuthClientProps) {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-sm bg-zinc-950 flex items-center justify-center">
-              <span className="text-white text-sm font-bold font-mono">M</span>
-            </div>
+          <div className="inline-flex items-center mb-4">
+            <BrandLogo />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-950 font-heading mb-2">
             {isSignUp ? 'Create your account' : 'Welcome back'}
