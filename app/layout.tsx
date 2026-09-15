@@ -16,9 +16,6 @@ export const metadata: Metadata = {
   description:
     "Professional calculator tools for mortgage, age, scientific, and personal finance planning.",
   applicationName: "Metricores",
-  verification: {
-    google: "ph55FRBjpG7QDI0SNLhsGnTGvnfoRyxInKi7KUugr7w",
-  },
   openGraph: {
     title: "Metricores",
     description:
