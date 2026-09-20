@@ -17,7 +17,7 @@ const GraphingView = dynamic(() => import("@/components/GraphingView"), {
 export default function CalculatorClient() {
   const params = useParams();
   const router = useNextRouter();
-  const id = params.id as CalculatorId;
+  const id = (params.id as string).toLowerCase() as CalculatorId;
 
   const handleBack = () => {
     router.push("/");

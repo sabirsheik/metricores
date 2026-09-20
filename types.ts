@@ -50,17 +50,38 @@ export interface FAQItem {
 
 export interface CalculatorSchema {
   id: CalculatorId;
+  slug: string;
   name: string;
   shortDescription: string;
   category: 'Financial Mathematics' | 'Personal Finance' | 'Practical Mathematics' | 'Basic Mathematics' | 'Planning / Everyday';
   keywords?: string[];
-  lastUpdated: string;
-  inputs: InputField[];
+  searchIntent?: string;
+  targetAudience?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  introduction?: string;
+  howItWorks?: string[];
   formula: {
     equation: string;
     description: string;
     steps: string[];
   };
+  workedExample?: {
+    scenario: string;
+    explanation: string;
+  };
+  assumptions?: string[];
+  limitations?: string[];
+  accuracyNotes?: string[];
+  relatedCalculators: CalculatorId[];
+  relatedGuides: string[];
+  jurisdiction?: string;
+  currency?: string;
+  methodologyVersion?: string;
+  lastReviewed?: string;
+  schemaType?: 'Calculator' | 'FinancialCalculator' | 'Tool';
+  lastUpdated: string;
+  inputs: InputField[];
   example: {
     scenario: string;
     explanation: string;
@@ -88,12 +109,18 @@ export interface CalculatorWorkspace {
 
 export interface GuideArticle {
   id: string;
+  slug: string;
   title: string;
+  seoTitle?: string;
+  seoDescription?: string;
   excerpt: string;
   content: string;
   category: string;
   readTime: string;
   publishedDate: string;
+  relatedCalculators?: CalculatorId[];
+  relatedGuides?: string[];
+  keywords?: string[];
 }
 
 export interface User {

@@ -3,11 +3,16 @@ import { GuideArticle } from '@/types';
 export const guidesData: GuideArticle[] = [
   {
     id: 'understanding-amortization',
+    slug: 'understanding-amortization',
     title: 'How Mortgage Interest Works',
+    seoTitle: 'How Mortgage Interest Works | Metricores',
+    seoDescription: 'Learn how mortgage interest, amortization, and principal reduction work over time.',
     excerpt: 'Demystifying how mortgage interest compounds over time and how small, structured prepayment cycles can shave years off your loan term.',
     category: 'Finance & Mortgages',
     readTime: '6 min read',
     publishedDate: 'June 28, 2026',
+    relatedCalculators: ['mortgage', 'loan'],
+    keywords: ['mortgage interest', 'amortization', 'loan payment'],
     content: `When you take out a long-term loan, such as a 30-year fixed mortgage, your monthly payments are calculated using an **amortization schedule**. This schedule is designed to ensure that you pay a set amount each month, while the ratio of your payment that goes toward interest versus principal shifts over time.
 
 ### How Amortization Works
@@ -27,11 +32,16 @@ Here are three popular strategies to shorten your amortization schedule:
   },
   {
     id: 'marginal-vs-effective-tax-rates',
+    slug: 'marginal-vs-effective-tax-rates',
     title: 'ROI Explained',
+    seoTitle: 'ROI Explained | Metricores',
+    seoDescription: 'Understand return on investment, annualized returns, and how to compare investment performance in practice.',
     excerpt: 'Demystifying Return on Investment: how to measure, interpret, and optimize your business or personal financial return metrics correctly.',
     category: 'Finance & Investing',
     readTime: '5 min read',
     publishedDate: 'July 2, 2026',
+    relatedCalculators: ['roi', 'interest'],
+    keywords: ['roi explained', 'return on investment', 'annualized return'],
     content: `To make informed financial decisions, both individuals and business owners must grasp how progressive income taxation functions. A very common misconception is that entering a higher tax bracket means your entire income is suddenly taxed at that new rate. Fortunately, that is not how it works.
 
 ### Progressive Tax Brackets
@@ -59,11 +69,16 @@ Your effective tax rate will always be lower than your marginal tax rate, unless
   },
   {
     id: 'gross-margin-vs-markup',
+    slug: 'gross-margin-vs-markup',
     title: 'Profit Margin Guide',
+    seoTitle: 'Profit Margin Guide | Metricores',
+    seoDescription: 'Understand gross margin, markup, and pricing strategy with clearer business math.',
     excerpt: 'Confusing gross margin and markup is one of the leading causes of early-stage business failure. Here is how to price for profitability.',
     category: 'Business & Management',
     readTime: '7 min read',
     publishedDate: 'July 5, 2026',
+    relatedCalculators: ['profit-margin', 'roi'],
+    keywords: ['profit margin', 'gross margin', 'markup'],
     content: `Many new entrepreneurs use the terms "margin" and "markup" interchangeably. While both metrics are derived from the relationship between cost of goods sold (COGS) and selling price, they measure entirely different percentages. Confusing them can lead to underpriced inventory, tight margins, and eventual business insolvency.
 
 ### Defining the Terms
@@ -97,3 +112,7 @@ Let’s check the actual Gross Margin at an $84 selling price:
 By confusing the two, you priced your items at $84 instead of the correct **$100** needed to reach your 40% margin. You have a massive cash deficit, which directly impacts your business survival. Always use a dedicated calculator to verify your target parameters before launching sales campaigns.`
   }
 ];
+
+export function getGuideBySlug(slug: string): GuideArticle | undefined {
+  return guidesData.find((guide) => guide.slug === slug || guide.id === slug);
+}

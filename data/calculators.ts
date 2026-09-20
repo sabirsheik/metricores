@@ -5,9 +5,21 @@ import { calculateReverseMortgage } from '@/utils/reverseMortgage';
 export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   scientific: {
     id: 'scientific',
+    slug: 'scientific',
     name: 'Scientific Calculator',
+    seoTitle: 'Scientific Calculator',
+    seoDescription: 'Evaluate trigonometric, logarithmic, and general math expressions accurately in a fast scientific calculator.',
     shortDescription: 'Compute high-precision mathematics with advanced trigonometric, logarithmic, and custom memory operations.',
     category: 'Basic Mathematics',
+    searchIntent: 'calculate scientific expressions',
+    targetAudience: 'students and professionals',
+    relatedCalculators: ['percentage', 'time', 'age'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [],
     formula: {
@@ -37,9 +49,21 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   graphing: {
     id: 'graphing',
+    slug: 'graphing',
     name: 'Graphing Calculator',
+    seoTitle: 'Graphing Calculator',
+    seoDescription: 'Plot equations, inspect function behavior, and explore graphs with a responsive graphing calculator.',
     shortDescription: 'Plot mathematical equations in real time, customize grid steps, and explore trigonometric functions.',
     category: 'Basic Mathematics',
+    searchIntent: 'plot mathematical functions and graph equations',
+    targetAudience: 'students and analysts',
+    relatedCalculators: ['scientific', 'percentage'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [],
     formula: {
@@ -68,9 +92,30 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   mortgage: {
     id: 'mortgage',
+    slug: 'mortgage',
     name: 'Mortgage Calculator',
+    seoTitle: 'Mortgage Calculator',
+    seoDescription: 'Estimate your monthly mortgage payment, principal and interest, and the total cost of a home loan.',
     shortDescription: 'Calculate your monthly mortgage payment, interest rates, and total amortization schedule.',
     category: 'Financial Mathematics',
+    keywords: ['mortgage calculator', 'monthly mortgage payment', 'home loan calculator'],
+    searchIntent: 'calculate monthly mortgage payment',
+    targetAudience: 'homebuyers and homeowners',
+    introduction: 'Use this calculator to estimate the monthly payment, total interest, and full cost of a fixed-rate home loan.',
+    howItWorks: [
+      'Subtract the down payment from the purchase price to estimate the loan principal.',
+      'Convert the annual interest rate to a monthly rate and apply the standard amortization formula.',
+      'Add the lifetime interest to the loan amount to estimate total cost over the selected term.'
+    ],
+    assumptions: ['Interest is fixed throughout the term.', 'Taxes, insurance, and HOA fees are not included in the base payment.'],
+    limitations: ['This estimate does not include taxes, insurance, or closing costs.', 'Actual lender offers may vary based on credit, loan product, and fees.'],
+    relatedCalculators: ['loan', 'payment', 'interest'],
+    relatedGuides: ['understanding-amortization'],
+    jurisdiction: 'United States',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -151,10 +196,26 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   'reverse-mortgage': {
     id: 'reverse-mortgage',
+    slug: 'reverse-mortgage',
     name: 'Reverse Mortgage Calculator',
+    seoTitle: 'Reverse Mortgage Calculator',
+    seoDescription: 'Estimate available reverse mortgage proceeds, principal growth, and projected home equity over time.',
     shortDescription: 'See how much cash you may receive and how your home equity could change over time.',
     category: 'Personal Finance',
     keywords: ['reverse mortgage calculator', 'reverse mortgage estimate', 'reverse mortgage proceeds', 'home equity', 'reverse mortgage balance', 'reverse mortgage interest', 'remaining home equity'],
+    searchIntent: 'estimate reverse mortgage proceeds',
+    targetAudience: 'older homeowners planning for retirement',
+    introduction: 'This tool estimates available proceeds and projected home equity using a simplified model based on age, home value, current mortgage balance, and rate assumptions.',
+    howItWorks: ['Estimate available equity after subtracting the existing mortgage and closing costs.', 'Apply an illustrative reverse mortgage factor based on age and rate assumptions.', 'Project the loan balance and remaining equity over the selected term.'],
+    assumptions: ['The model assumes a fixed planning rate and a flat home value for projection purposes.', 'It is educational and not a lender quote.'],
+    limitations: ['Actual reverse mortgage eligibility and proceeds depend on lender program rules, fees, and underwriting.', 'The model does not account for taxes, insurance, property condition, or local regulations.'],
+    relatedCalculators: ['mortgage', 'loan'],
+    relatedGuides: [],
+    jurisdiction: 'United States',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'September 2026',
     inputs: [
       {
@@ -285,9 +346,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   loan: {
     id: 'loan',
+    slug: 'loan',
     name: 'Loan Calculator',
+    seoTitle: 'Loan Calculator',
+    seoDescription: 'Estimate monthly loan payments and total interest for debt, auto, and personal loans.',
     shortDescription: 'Compute payments and total interest for personal, auto, or student loans.',
     category: 'Financial Mathematics',
+    searchIntent: 'calculate loan repayment and total interest',
+    targetAudience: 'borrowers comparing financing options',
+    introduction: 'This calculator estimates the fixed monthly payment, total interest, and total repayment cost for an installment loan.',
+    howItWorks: ['Use the standard amortization formula for a fixed interest rate and term.', 'Convert the annual rate to a monthly rate before solving the payment schedule.', 'Compare the total repayment cost against the original loan amount.'],
+    assumptions: ['Each payment is applied at a consistent monthly interval.', 'The rate remains fixed for the life of the loan.'],
+    limitations: ['This tool does not include fees, taxes, or variable-rate adjustments.', 'Actual lender offers may differ based on credit and underwriting.'],
+    relatedCalculators: ['mortgage', 'payment', 'interest'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'June 2026',
     inputs: [
       {
@@ -353,9 +430,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   tax: {
     id: 'tax',
+    slug: 'tax',
     name: 'Tax Calculator',
+    seoTitle: 'Tax Calculator',
+    seoDescription: 'Estimate annual taxable income, marginal tax burden, and effective tax rate from your salary and deductions.',
     shortDescription: 'Estimate your annual federal income tax liabilities and effective tax bracket.',
     category: 'Practical Mathematics',
+    searchIntent: 'estimate tax liability',
+    targetAudience: 'individual taxpayers and planners',
+    introduction: 'This estimate helps you understand how annual income and deductions can affect taxable income and effective tax rates.',
+    howItWorks: ['Subtract deductions from gross annual income to compute taxable income.', 'Apply progressive income tax brackets to each slice of taxable income.', 'Divide total tax by gross income to estimate the effective rate.'],
+    assumptions: ['This model uses simplified U.S.-style tax brackets and a single filing status.', 'The estimate is not a legal tax filing or tax advice.'],
+    limitations: ['State taxes, credits, itemized deductions, and local rules are not modeled here.', 'Actual tax liability can vary based on your full return and jurisdiction.'],
+    relatedCalculators: ['roi', 'percentage'],
+    relatedGuides: [],
+    jurisdiction: 'United States',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'May 2026',
     inputs: [
       {
@@ -418,9 +511,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   interest: {
     id: 'interest',
+    slug: 'interest',
     name: 'Interest Calculator',
+    seoTitle: 'Interest Calculator',
+    seoDescription: 'Project investment growth, compound interest, and monthly contributions over a set term.',
     shortDescription: 'Calculate simple or compound interest growth with regular monthly contributions.',
     category: 'Financial Mathematics',
+    searchIntent: 'calculate compound interest and investment growth',
+    targetAudience: 'investors and savers',
+    introduction: 'Estimate how an initial balance plus regular deposits can grow under simple or compound interest assumptions.',
+    howItWorks: ['Project growth on the starting principal.', 'Accumulate regular monthly contributions over time.', 'Compare compound and simple interest scenarios.'],
+    assumptions: ['Interest is applied at a consistent annual rate.', 'Contributions occur monthly and remain stable during the term.'],
+    limitations: ['This estimate does not include taxes, fees, inflation, or market variance.', 'Actual portfolio returns can differ materially from the assumed rate.'],
+    relatedCalculators: ['roi', 'loan', 'payment'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -505,9 +614,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   payment: {
     id: 'payment',
+    slug: 'payment',
     name: 'Payment Calculator',
+    seoTitle: 'Payment Calculator',
+    seoDescription: 'Estimate debt payoff timing or required monthly payments for balances and APRs.',
     shortDescription: 'Calculate required monthly payments or payoff timelines for debts and credit cards.',
     category: 'Financial Mathematics',
+    searchIntent: 'calculate debt repayment schedule',
+    targetAudience: 'borrowers managing debt',
+    introduction: 'Use this tool to estimate the monthly payment needed to clear a balance in a target timeframe, or estimate how long a fixed payment will take to repay debt.',
+    howItWorks: ['Convert the APR to a monthly interest rate.', 'Solve for the payment or for payoff months with the amortization formula.', 'Check whether the selected payment is sufficient to reduce the debt.'],
+    assumptions: ['Interest is fixed and charged monthly.', 'No additional fees or penalties are included in the estimate.'],
+    limitations: ['The model does not include cards with changing rates, late fees, or promotional periods.', 'Actual repayment can vary based on billing cycles and lender rules.'],
+    relatedCalculators: ['loan', 'interest', 'mortgage'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'April 2026',
     inputs: [
       {
@@ -593,9 +718,24 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   time: {
     id: 'time',
+    slug: 'time',
     name: 'Time Calculator',
+    seoTitle: 'Time Calculator',
+    seoDescription: 'Calculate the day difference between dates or shift a calendar date by business or calendar days.',
     shortDescription: 'Calculate total business days between dates or add calendar days to a start date.',
     category: 'Practical Mathematics',
+    searchIntent: 'calculate date differences and business days',
+    targetAudience: 'project planners and general users',
+    introduction: 'This calculator measures the gap between dates or shifts a date by a number of calendar or business days.',
+    howItWorks: ['Choose date difference or date offset mode.', 'Use calendar logic to count elapsed days.', 'Optionally exclude weekends to estimate business days.'],
+    assumptions: ['Business days are defined as Monday through Friday.', 'Public holidays are not included unless separately modeled.'],
+    limitations: ['This tool does not account for local holiday calendars or work schedules.', 'Results are based on the Gregorian calendar and standard weekend exclusions.'],
+    relatedCalculators: ['age', 'payment'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'June 2026',
     inputs: [
       {
@@ -669,10 +809,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   age: {
     id: 'age',
+    slug: 'age',
     name: 'Age Calculator',
+    seoTitle: 'Age Calculator',
+    seoDescription: 'Calculate exact age in years, months, and days from a birth date or a selected date in time.',
     shortDescription: 'Calculate exact age in years, months, and days from a date of birth.',
     category: 'Planning / Everyday',
     keywords: ['age calculator', 'exact age calculator', 'calculate age', 'date of birth calculator', 'age in years months and days'],
+    searchIntent: 'calculate exact age',
+    targetAudience: 'individuals and families',
+    introduction: 'This calculator measures age using actual calendar months and days rather than a fixed number of days per year.',
+    howItWorks: ['Validate the birth date and calculation date.', 'Count completed calendar years, months, and days.', 'Report additional totals such as elapsed days and upcoming birthday details.'],
+    assumptions: ['Leap years and month lengths are handled according to the Gregorian calendar.', 'February 29 birthdays are treated consistently in non-leap years.'],
+    limitations: ['The result reflects calendar age, not legal age definitions for all jurisdictions.', 'Custom local calendar systems are not modeled.'],
+    relatedCalculators: ['time', 'tax'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'September 2026',
     inputs: [
       {
@@ -722,9 +877,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   'profit-margin': {
     id: 'profit-margin',
+    slug: 'profit-margin',
     name: 'Profit Margin Calculator',
+    seoTitle: 'Profit Margin Calculator',
+    seoDescription: 'Determine price, gross margin, and markup using realistic business-profit calculations.',
     shortDescription: 'Find your selling price, gross profit margins, and markup metrics.',
     category: 'Financial Mathematics',
+    searchIntent: 'calculate profit margin and markup',
+    targetAudience: 'business owners and operators',
+    introduction: 'This calculator helps compare margin and markup to make more informed pricing decisions.',
+    howItWorks: ['Compute gross profit from cost and selling price.', 'Express margin as a share of price and markup as a share of cost.', 'Use the target margin to back into a selling price.'],
+    assumptions: ['The input cost is treated as a single product cost or COGS value.', 'The pricing model assumes a straightforward product scenario.'],
+    limitations: ['It does not model overhead, taxes, shipping, or variable operating expenses.', 'Actual business pricing may require broader cost analysis.'],
+    relatedCalculators: ['roi', 'percentage', 'discount'],
+    relatedGuides: ['gross-margin-vs-markup'],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -797,9 +968,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   roi: {
     id: 'roi',
+    slug: 'roi',
     name: 'ROI Calculator',
+    seoTitle: 'ROI Calculator',
+    seoDescription: 'Measure total return on investment and annualized performance for a capital or business investment.',
     shortDescription: 'Measure the return on investment percentage and annualized ROI of projects.',
     category: 'Financial Mathematics',
+    searchIntent: 'calculate return on investment',
+    targetAudience: 'investors and business operators',
+    introduction: 'This tool estimates total investment return and annualized gain over a defined holding period.',
+    howItWorks: ['Subtract the original investment from the final value to find profit.', 'Divide profit by the initial amount to get total ROI.', 'Annualize the result using the investment term.'],
+    assumptions: ['A single initial capital amount and final return value are used.', 'Cash flows are simplified as a single end-of-period value.'],
+    limitations: ['It does not include interim dividends, fees, taxes, or irregular cash flows.', 'Performance may differ materially from the modeled assumption.'],
+    relatedCalculators: ['interest', 'profit-margin'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'FinancialCalculator',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -861,9 +1048,24 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   percentage: {
     id: 'percentage',
+    slug: 'percentage',
     name: 'Percentage Calculator',
+    seoTitle: 'Percentage Calculator',
+    seoDescription: 'Solve percentage-of, proportion, and percentage-change questions quickly and clearly.',
     shortDescription: 'Solve percentage equations, proportion rates, and percentage increase or decrease.',
     category: 'Basic Mathematics',
+    searchIntent: 'calculate percentages and percentage change',
+    targetAudience: 'students and general users',
+    introduction: 'Use this tool to solve common percentage, ratio, and change questions with a quick formula-based result.',
+    howItWorks: ['Choose the relevant percentage mode.', 'Apply the standard formula for percent-of, proportion, or change.', 'Review the result in context.'],
+    assumptions: ['The function is based on standard percentage math.', 'The result assumes direct linear relationships.'],
+    limitations: ['It does not handle probabilistic or non-linear percentage scenarios.', 'Complex business calculations may require a specialized tool.'],
+    relatedCalculators: ['discount', 'tip', 'scientific'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -921,9 +1123,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   discount: {
     id: 'discount',
+    slug: 'discount',
     name: 'Discount & Sale Calculator',
+    seoTitle: 'Discount Calculator',
+    seoDescription: 'Estimate sale savings, discounted price, and final checkout cost including tax.',
     shortDescription: 'Calculate the promotional sale savings, net purchase price, and tax additions.',
     category: 'Basic Mathematics',
+    searchIntent: 'calculate discounts and sale prices',
+    targetAudience: 'shoppers and retail planners',
+    introduction: 'Estimate how much you save on a marked-down item and how tax affects the final checkout price.',
+    howItWorks: ['Calculate the markdown from the original price.', 'Apply the discount to the original purchase price.', 'Add the tax rate to the discounted total.'],
+    assumptions: ['Tax is computed on the discounted subtotal.', 'Only a single discount rate is modeled.'],
+    limitations: ['Coupons, stacking discounts, and multi-item promotions are not modeled.', 'Local tax treatment can vary by jurisdiction.'],
+    relatedCalculators: ['percentage', 'tip'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -986,9 +1204,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   tip: {
     id: 'tip',
+    slug: 'tip',
     name: 'Tip & Split Calculator',
+    seoTitle: 'Tip & Split Calculator',
+    seoDescription: 'Estimate gratuity and split a bill across multiple people with a clear cost breakdown.',
     shortDescription: 'Calculate standard gratuity amounts and split the total bill evenly among dinner guests.',
     category: 'Basic Mathematics',
+    searchIntent: 'calculate tip and split bill',
+    targetAudience: 'restaurant goers and groups',
+    introduction: 'Use this tool to estimate the gratuity and divide a bill fairly between guests.',
+    howItWorks: ['Calculate the tip based on the subtotal and selected percentage.', 'Add the tip to the bill total.', 'Divide that total by the number of people.'],
+    assumptions: ['Tip is calculated on the pre-tax subtotal.', 'The split is even across all guests.'],
+    limitations: ['It does not model service fees, taxes, or uneven splits.', 'Custom group payment arrangements are not considered.'],
+    relatedCalculators: ['percentage', 'discount'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -1051,9 +1285,25 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
   },
   vat: {
     id: 'vat',
+    slug: 'vat',
     name: 'VAT (Value Added Tax) Calculator',
+    seoTitle: 'VAT Calculator',
+    seoDescription: 'Add VAT to a net price or remove VAT from a gross price to estimate tax amounts precisely.',
     shortDescription: 'Add or extract Value Added Tax (VAT) from purchase totals.',
     category: 'Practical Mathematics',
+    searchIntent: 'calculate VAT and tax-inclusive amounts',
+    targetAudience: 'buyers and finance professionals',
+    introduction: 'This calculator supports both tax-inclusive and tax-exclusive VAT calculations depending on the scenario you want to model.',
+    howItWorks: ['Choose whether to add VAT or remove it from an amount.', 'Apply the VAT percentage to the relevant base.', 'Present the tax component and resulting total.'],
+    assumptions: ['The VAT rate is applied consistently and uniformly.', 'The calculation uses a single rate for the entire transaction.'],
+    limitations: ['The calculator does not model multiple-rate jurisdictions or exemptions.', 'Actual VAT treatment can vary by region and transaction type.'],
+    relatedCalculators: ['tax', 'discount'],
+    relatedGuides: [],
+    jurisdiction: 'General',
+    currency: 'USD',
+    methodologyVersion: '1.0',
+    lastReviewed: '2026-09-21',
+    schemaType: 'Tool',
     lastUpdated: 'July 2026',
     inputs: [
       {
@@ -1113,6 +1363,20 @@ export const calculatorsData: Record<CalculatorId, CalculatorSchema> = {
     ]
   }
 };
+
+export const publicCalculatorIds = Object.keys(calculatorsData) as CalculatorId[];
+
+export function getCalculatorBySlug(slug: string): CalculatorSchema | undefined {
+  const normalized = slug.trim().toLowerCase();
+  return publicCalculatorIds
+    .map((id) => calculatorsData[id])
+    .find((calculator) => calculator.slug === normalized || calculator.id === normalized);
+}
+
+export function getCalculatorCanonicalUrl(slug: string): string {
+  const calculator = getCalculatorBySlug(slug);
+  return calculator ? `/calculators/${calculator.slug}` : '/calculators';
+}
 
 export function calculate(id: CalculatorId, inputs: Record<string, any>): ResultField[] {
   switch (id) {
