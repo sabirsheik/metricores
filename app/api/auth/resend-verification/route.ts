@@ -3,13 +3,21 @@ import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { generateSecureToken, hashToken } from '@/lib/token';
 import { sendVerificationEmail } from '@/lib/email';
+import { createRateLimiter, isValidEmail, normalizeEmail } from '@/lib/security';
+
+const resendVerificationLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email } = body;
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!resendVerificationLimiter(clientIp, 'resend-verification')) {
+      return NextResponse.json({ error: 'Too many verification emails. Please try again later.' }, { status: 429 });
+    }
 
-    if (!email) {
+    const body = await request.json();
+    const email = normalizeEmail(body.email);
+
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 

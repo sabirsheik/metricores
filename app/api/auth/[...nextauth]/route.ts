@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
+import { normalizeEmail } from '@/lib/security';
 
 const debug = (message: string, ...data: unknown[]) => {
   if (process.env.NODE_ENV !== 'development') return;
@@ -33,7 +34,7 @@ function getProviderImage(profile: any, user: any): string | undefined {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: true, // Enable NextAuth debug mode
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -60,12 +61,18 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const normalizedEmail = normalizeEmail(credentials.email);
+        if (!normalizedEmail) {
+          debug('Invalid email in credentials authorize');
+          return null;
+        }
+
         try {
           await dbConnect();
           debug('Connected to MongoDB');
 
-          const user = await User.findOne({ email: credentials.email });
-          debug('Found user:', user);
+          const user = await User.findOne({ email: normalizedEmail });
+          debug('Found user:', user ? 'Yes' : 'No');
 
           if (!user || !user.password) {
             debug('User not found or no password');
@@ -121,10 +128,11 @@ export const authOptions: NextAuthOptions = {
         debug('Connected to MongoDB for signIn');
 
         if (account?.provider === 'google' && profile) {
-          debug('Processing Google sign-in for:', profile.email);
+          const normalizedGoogleEmail = normalizeEmail(profile.email);
+          debug('Processing Google sign-in for:', normalizedGoogleEmail);
           const providerImage = getProviderImage(profile, user);
 
-          const existingUser = await User.findOne({ email: profile.email });
+          const existingUser = await User.findOne({ email: normalizedGoogleEmail });
           debug('Existing user found:', existingUser ? 'Yes' : 'No');
 
           let googleUser = existingUser;
@@ -250,10 +258,10 @@ export const authOptions: NextAuthOptions = {
       return baseUrl + '/profile';
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'development-only-secret-change-me',
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   pages: {
     signIn: '/auth',

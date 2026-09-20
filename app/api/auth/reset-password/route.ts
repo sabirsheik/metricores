@@ -3,12 +3,21 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { hashToken } from '@/lib/token';
+import { createRateLimiter } from '@/lib/security';
 import { validatePassword } from '@/utils/password';
+
+const resetPasswordLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!resetPasswordLimiter(clientIp, 'reset-password')) {
+      return NextResponse.json({ error: 'Too many password reset attempts. Please try again later.' }, { status: 429 });
+    }
+
     const body = await request.json();
-    const { token, password } = body;
+    const token = typeof body.token === 'string' ? body.token.trim() : '';
+    const password = typeof body.password === 'string' ? body.password : '';
 
     if (!token || !password) {
       return NextResponse.json({ error: 'Token and password are required' }, { status: 400 });

@@ -3,28 +3,30 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
+import { sanitizeText, normalizeEmail } from '@/lib/security';
 
 export async function PUT(request: Request) {
   try {
-    // Get session
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await dbConnect();
-    const { fullName, username, bio, profilePicture } = await request.json();
-    const profileImage = typeof profilePicture === 'string' && /^https?:\/\//i.test(profilePicture)
-      ? profilePicture
+    const body = await request.json();
+    const fullName = sanitizeText(body.fullName, 80) || session.user.name || 'User';
+    const username = typeof body.username === 'string' ? sanitizeText(body.username, 30) || undefined : undefined;
+    const bio = typeof body.bio === 'string' ? sanitizeText(body.bio, 500) || undefined : undefined;
+    const profileImage = typeof body.profilePicture === 'string' && /^https?:\/\//i.test(body.profilePicture)
+      ? body.profilePicture
       : undefined;
 
-    // Update user
     const updatedUser = await User.findByIdAndUpdate(
       session.user.id,
       {
-        fullName: fullName || session.user.name,
-        username: username || undefined,
-        bio: bio || undefined,
+        fullName,
+        username,
+        bio,
         ...(profileImage ? { profilePicture: profileImage } : {}),
       },
       { new: true, runValidators: true }

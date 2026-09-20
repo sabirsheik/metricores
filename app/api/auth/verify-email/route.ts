@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { hashToken } from '@/lib/token';
+import { createRateLimiter } from '@/lib/security';
+
+const verifyEmailLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 20 });
 
 export async function GET(request: NextRequest) {
   try {
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!verifyEmailLimiter(clientIp, 'verify-email')) {
+      return NextResponse.redirect(new URL('/auth?error=rate-limited', request.url));
+    }
+
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 

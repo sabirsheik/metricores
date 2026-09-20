@@ -4,7 +4,10 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { calculatorsData } from '@/data/calculators';
+import { createRateLimiter, sanitizeText } from '@/lib/security';
 import type { CalculationRecord, CalculatorId } from '@/types';
+
+const workspaceLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 30 });
 
 const MAX_HISTORY = 50;
 const MAX_SAVED = 50;
@@ -41,6 +44,11 @@ export async function POST(request: Request) {
     const user = await getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!workspaceLimiter(clientIp, 'workspace')) {
+      return NextResponse.json({ error: 'Too many workspace updates. Please try again later.' }, { status: 429 });
+    }
+
     const body = await request.json();
     const calculatorId = body.calculatorId as CalculatorId;
     const calculator = calculatorsData[calculatorId];
@@ -72,7 +80,7 @@ export async function POST(request: Request) {
         category: calculator.category,
         inputs: body.inputs || {},
         results: body.results || [],
-        name: typeof body.name === 'string' && body.name.trim() ? body.name.trim() : undefined,
+        name: typeof body.name === 'string' ? sanitizeText(body.name, 120) || undefined : undefined,
         createdAt: new Date().toISOString(),
       };
       user.savedCalculations = [record, ...(user.savedCalculations || [])].slice(0, MAX_SAVED) as any;

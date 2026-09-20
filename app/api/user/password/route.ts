@@ -4,9 +4,17 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import bcrypt from 'bcryptjs';
+import { createRateLimiter } from '@/lib/security';
+
+const passwordUpdateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 10 });
 
 export async function PUT(request: Request) {
   try {
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!passwordUpdateLimiter(clientIp, 'password-update')) {
+      return NextResponse.json({ error: 'Too many password update attempts. Please try again later.' }, { status: 429 });
+    }
+
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
