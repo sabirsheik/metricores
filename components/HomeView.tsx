@@ -279,7 +279,7 @@ export default function HomeView({
   return (
     <div className="bg-zinc-50/30 min-h-screen" id="home-root">
       {/* 1. HERO BANNER - EXECUTIVE DARK GRID HEADER */}
-      <div className="relative bg-zinc-950 text-white overflow-hidden pb-20 sm:pb-28 md:pb-36 pt-16 md:pt-20" id="hero-banner">
+      <div className="relative bg-zinc-950 text-white overflow-hidden pb-20 sm:pb-28 md:pb-36 pt-8 md:pt-8" id="hero-banner">
         {/* Decorative structural grid background lines */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
 
