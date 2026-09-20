@@ -118,9 +118,49 @@ export interface GuideArticle {
   category: string;
   readTime: string;
   publishedDate: string;
+  purpose?: string;
+  introduction?: string;
+  sections?: string[];
+  examples?: string[];
+  methodology?: string[];
+  calculatorCta?: string;
+  lastReviewed?: string;
   relatedCalculators?: CalculatorId[];
   relatedGuides?: string[];
   keywords?: string[];
+}
+
+export interface SearchIntentProfile {
+  calculatorId: CalculatorId;
+  primaryIntent: string;
+  secondaryIntents: string[];
+  userProblem: string;
+  targetAudience: string;
+  relatedQuestions: string[];
+  relatedCalculators: CalculatorId[];
+  supportingGuides: string[];
+}
+
+export interface TopicCluster {
+  category: string;
+  slug: string;
+  primaryUserNeed: string;
+  calculators: CalculatorId[];
+  guides: string[];
+}
+
+export interface GuideQualityProfile {
+  guideId: string;
+  title: string;
+  purpose: string;
+  introduction: string;
+  sections: string[];
+  examples: string[];
+  methodology: string[];
+  calculatorCta: string;
+  relatedCalculators: CalculatorId[];
+  relatedGuides: string[];
+  lastReviewed: string;
 }
 
 export interface User {
