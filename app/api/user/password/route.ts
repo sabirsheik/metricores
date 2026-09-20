@@ -5,6 +5,7 @@ import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import bcrypt from 'bcryptjs';
 import { createRateLimiter } from '@/lib/security';
+import { validatePassword } from '@/utils/password';
 
 const passwordUpdateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 10 });
 
@@ -30,14 +31,18 @@ export async function PUT(request: Request) {
 
     // Handle setting password for first time (Google users)
     if (setPassword) {
+      if (user.provider !== 'google' || user.password) {
+        return NextResponse.json({ error: 'A password can only be set once for a Google account.' }, { status: 400 });
+      }
       if (!newPassword || !confirmPassword) {
         return NextResponse.json({ error: 'Please fill all fields' }, { status: 400 });
       }
       if (newPassword !== confirmPassword) {
         return NextResponse.json({ error: 'Passwords do not match' }, { status: 400 });
       }
-      if (newPassword.length < 6) {
-        return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+      const passwordValidation = validatePassword(newPassword);
+      if (!passwordValidation.isValid) {
+        return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
       }
 
       const hashedPassword = await bcrypt.hash(newPassword, 12);
@@ -60,14 +65,19 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Passwords do not match' }, { status: 400 });
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.isValid) {
+      return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
     }
 
     // Verify current password
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password!);
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Current password is incorrect' }, { status: 400 });
+    }
+
+    if (await bcrypt.compare(newPassword, user.password!)) {
+      return NextResponse.json({ error: 'New password must be different from your current password' }, { status: 400 });
     }
 
     // Hash and update new password
