@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import ResetPasswordClient from './reset-password-client';
 
+export const metadata = {
+  title: 'Reset Password | Metricores',
+  description: 'Reset your Metricores account password.',
+  robots: { index: false, follow: false },
+};
+
 export default function ResetPasswordPage({
   searchParams,
 }: {

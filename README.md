@@ -204,7 +204,7 @@ It supports:
 - pan and zoom interaction
 - theme and fullscreen behavior
 - local math evaluation in the browser
-- output export or visual inspection
+- visual inspection of plotted output
 
 This is a high-value interactive surface that is distinct from standard calculator forms and is intentionally separated from the server-side business logic.
 
@@ -420,6 +420,8 @@ Current SEO-oriented elements include:
 - structured calculator metadata
 - landing pages built around real calculator intent
 
+Public calculator and guide pages provide route metadata and canonical URLs. The sitemap includes public calculator and guide routes, while robots rules exclude API and account paths. Private account pages explicitly send `noindex` metadata. The current repository does not implement JSON-LD structured data, analytics, or an external error-monitoring provider.
+
 This is designed for quality, not spammy keyword mass-generation. The architecture favors genuine utility and coherent search intent instead of publishing thin pages for every keyword variation.
 
 ---
@@ -436,7 +438,10 @@ The app includes multiple safety controls:
 - authenticated checks on protected routes
 - input sanitization for user-generated text
 - URL validation for profile images
-- secure headers and privacy controls
+- bounded workspace history and saved-record arrays
+- secure response headers including frame, MIME-sniffing, referrer, and permissions policies
+
+The scientific and graphing expression engine uses a custom allowlisted parser. It does not use `eval`, the `Function` constructor, filesystem access, or network access for expression evaluation. Parser regression tests cover unsupported identifiers, property-access attempts, and undefined mathematical results.
 
 ### Important limitation
 
@@ -522,8 +527,9 @@ The project includes automated checks for:
 - password policy behavior
 - security helper behavior
 - search-intent and guide-quality architecture contracts
+- safe mathematical expression parsing and malicious-expression rejection
 
-This is a solid baseline for product quality, but browser-level end-to-end tests are still a recommended next step for high-risk user flows.
+The current suite is focused on deterministic calculation and utility behavior. Browser E2E tests, API integration tests against a test database, accessibility automation, and load testing are not currently configured.
 
 ---
 
@@ -578,13 +584,44 @@ This is a solid foundation for a real calculator platform rather than a single-p
 This project is not yet a fully mature financial SaaS platform. Some important constraints remain:
 
 - certain financial outputs are educational estimates, not financial advice
-- the app does not yet have a full browser E2E suite
+- the app does not yet have browser E2E or API integration test suites
 - no CI/CD deployment pipeline is configured in the repo yet
-- the architecture is ready for growth but not yet fully expanded into premium SaaS features
-- some production security controls still require operational hardening, monitoring, and broader review
+- no production analytics or external error-monitoring provider is configured
+- CSP, distributed rate limiting, CSRF review, dependency scanning, and operational alerting still require deployment-specific hardening
 - user data model can expand over time as product complexity grows
 
-This honesty matters. The app is functional and production-aware, but it is still evolving toward a larger scale product architecture.
+The application has a passing typecheck, unit test suite, and production build, but these limitations should be addressed before a high-risk public launch.
+
+## Implementation Status
+
+### Implemented
+
+- Next.js App Router application with typed calculator registry
+- Standard calculators plus dedicated scientific and graphing interfaces
+- Credentials and Google authentication flows
+- Email verification and password reset flows with hashed, expiring tokens
+- MongoDB-backed profile and workspace persistence
+- Public metadata, canonical URLs, sitemap, robots rules, and favicon
+- MIT license and repository documentation
+
+### Partially implemented
+
+- Rate limiting is process-local and is not a distributed production quota system.
+- Financial and tax calculators are educational estimates with documented assumptions, not official lender or tax outputs.
+- Workspace records are embedded in the user document and bounded to the current application limits.
+
+### Not implemented in this repository
+
+- Browser E2E test suite
+- API integration test suite with an isolated database
+- CI/CD workflow or deployment manifest
+- JSON-LD structured data
+- Analytics and external error monitoring
+- Database migration or seed framework
+
+### Planned or deployment-dependent
+
+Production monitoring, distributed abuse controls, CSP policy design, dependency scanning, and deployment-specific accessibility/performance measurement should be added as part of the operating environment rather than represented as existing application features.
 
 ---
 

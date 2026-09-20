@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import VerifyEmailClient from './verify-email-client';
 
+export const metadata = {
+  title: 'Verify Email | Metricores',
+  description: 'Verify your Metricores account email address.',
+  robots: { index: false, follow: false },
+};
+
 export default function VerifyEmailPage({
   searchParams,
 }: {

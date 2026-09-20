@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import AuthClient from './auth-client';
 
+export const metadata = {
+  title: 'Sign In | Metricores',
+  description: 'Sign in or create a Metricores account.',
+  robots: { index: false, follow: false },
+};
+
 export default function AuthPage({
   searchParams,
 }: {

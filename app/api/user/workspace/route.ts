@@ -1,16 +1,26 @@
 import { NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { calculatorsData } from '@/data/calculators';
-import { createRateLimiter, sanitizeText } from '@/lib/security';
+import { createRateLimiter, getClientIdentifier, sanitizeText } from '@/lib/security';
 import type { CalculationRecord, CalculatorId } from '@/types';
 
 const workspaceLimiter = createRateLimiter({ windowMs: 60 * 1000, maxRequests: 30 });
 
 const MAX_HISTORY = 50;
 const MAX_SAVED = 50;
+const MAX_REQUEST_BYTES = 100_000;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isResultList(value: unknown): value is CalculationRecord['results'] {
+  return Array.isArray(value) && value.length <= 50 && value.every((result) => isRecord(result));
+}
 
 async function getUser() {
   const session = await getServerSession(authOptions);
@@ -44,19 +54,33 @@ export async function POST(request: Request) {
     const user = await getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const clientIp = getClientIdentifier({ headers: request.headers });
     if (!workspaceLimiter(clientIp, 'workspace')) {
       return NextResponse.json({ error: 'Too many workspace updates. Please try again later.' }, { status: 429 });
     }
 
     const body = await request.json();
+    if (!isRecord(body) || JSON.stringify(body).length > MAX_REQUEST_BYTES) {
+      return NextResponse.json({ error: 'Invalid workspace payload' }, { status: 400 });
+    }
+
     const calculatorId = body.calculatorId as CalculatorId;
+    if (typeof calculatorId !== 'string' || !Object.prototype.hasOwnProperty.call(calculatorsData, calculatorId)) {
+      return NextResponse.json({ error: 'Unknown calculator' }, { status: 400 });
+    }
     const calculator = calculatorsData[calculatorId];
-    if (!calculator) return NextResponse.json({ error: 'Unknown calculator' }, { status: 400 });
+
+    if (body.inputs !== undefined && !isRecord(body.inputs)) {
+      return NextResponse.json({ error: 'Invalid calculator inputs' }, { status: 400 });
+    }
+
+    if (body.results !== undefined && !isResultList(body.results)) {
+      return NextResponse.json({ error: 'Invalid calculator results' }, { status: 400 });
+    }
 
     if (body.action === 'history') {
       const record: CalculationRecord = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: randomUUID(),
         calculatorId,
         calculatorName: calculator.name,
         category: calculator.category,
@@ -74,7 +98,7 @@ export async function POST(request: Request) {
       user.favoriteCalculators = Array.from(favorites) as any;
     } else if (body.action === 'save') {
       const record: CalculationRecord = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        id: randomUUID(),
         calculatorId,
         calculatorName: calculator.name,
         category: calculator.category,
@@ -100,6 +124,12 @@ export async function DELETE(request: Request) {
   try {
     const user = await getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const clientIp = getClientIdentifier({ headers: request.headers });
+    if (!workspaceLimiter(clientIp, 'workspace-delete')) {
+      return NextResponse.json({ error: 'Too many workspace updates. Please try again later.' }, { status: 429 });
+    }
+
     const { type, id } = await request.json();
     if (type === 'clear-history') user.history = [];
     else if (type === 'history') user.history = (user.history || []).filter((item: any) => item.id !== id) as any;

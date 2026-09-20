@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import ForgotPasswordClient from './forgot-password-client';
 
+export const metadata = {
+  title: 'Forgot Password | Metricores',
+  description: 'Request a password reset for your Metricores account.',
+  robots: { index: false, follow: false },
+};
+
 export default function ForgotPasswordPage() {
   return (
     <Suspense fallback={

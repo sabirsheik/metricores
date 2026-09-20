@@ -21,10 +21,8 @@ export async function GET(request: NextRequest) {
     }
 
     await dbConnect();
-    const tokenCandidates = [token, hashToken(token)];
-
     const user = await User.findOne({
-      verificationToken: { $in: tokenCandidates },
+      verificationToken: hashToken(token),
       verificationTokenExpires: { $gt: new Date() },
     });
 
