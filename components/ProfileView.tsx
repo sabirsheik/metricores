@@ -11,7 +11,6 @@ import {
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
 import { cn } from '@/utils/cn';
-import { validatePassword } from '@/utils/password';
 import AccountWorkspace from './AccountWorkspace';
 
 export default function ProfileView() {
@@ -39,13 +38,10 @@ export default function ProfileView() {
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const newPasswordValidation = validatePassword(passwordForm.newPassword || '');
-  const showPasswordRequirements = Boolean(passwordForm.newPassword);
   const isPasswordFormValid =
     passwordForm.currentPassword.trim().length > 0 &&
     passwordForm.newPassword.trim().length > 0 &&
     passwordForm.confirmPassword.trim().length > 0 &&
-    newPasswordValidation.isValid &&
     passwordForm.newPassword === passwordForm.confirmPassword;
 
   // Redirect if not authenticated
@@ -141,11 +137,6 @@ export default function ProfileView() {
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error('Passwords do not match.');
-      return;
-    }
-
-    if (!newPasswordValidation.isValid) {
-      toast.error(newPasswordValidation.message);
       return;
     }
 
@@ -502,45 +493,6 @@ export default function ProfileView() {
                           </button>
                         </div>
 
-                        {showPasswordRequirements && (
-                          <div className="mt-3 space-y-3 rounded-sm border border-zinc-200 bg-zinc-50 p-4">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[11px] font-semibold text-zinc-600">
-                                Strength: {newPasswordValidation.strength}
-                              </span>
-                              <span className={cn('text-[11px] font-medium', newPasswordValidation.isValid ? 'text-emerald-600' : 'text-zinc-500')}>
-                                {newPasswordValidation.message}
-                              </span>
-                            </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
-                              <div
-                                className={cn('h-full transition-all',
-                                  newPasswordValidation.strength === 'Weak' ? 'w-1/3 bg-red-500' :
-                                  newPasswordValidation.strength === 'Medium' ? 'w-2/3 bg-amber-500' : 'w-full bg-emerald-500')}
-                              />
-                            </div>
-                            <div className="grid gap-1.5 text-[11px] text-zinc-600">
-                              {[
-                                ['At least 6 characters', newPasswordValidation.requirements.length],
-                                ['1 uppercase letter', newPasswordValidation.requirements.uppercase],
-                                ['1 lowercase letter', newPasswordValidation.requirements.lowercase],
-                                ['1 number', newPasswordValidation.requirements.number],
-                                ['1 special character', newPasswordValidation.requirements.special],
-                                ['Avoid common passwords', newPasswordValidation.requirements.common],
-                                ['Avoid repeated characters', newPasswordValidation.requirements.repeated],
-                                ['Avoid sequential patterns', newPasswordValidation.requirements.sequential],
-                              ].map(([label, met]) => {
-                                const requirementLabel = label as string;
-                                return (
-                                  <div key={requirementLabel} className="flex items-center gap-2">
-                                    <span className={cn('h-2.5 w-2.5 rounded-full', met ? 'bg-emerald-500' : 'bg-zinc-300')} />
-                                    <span className={met ? 'text-emerald-700' : 'text-zinc-600'}>{requirementLabel}</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
                       </div>
 
                       <div>

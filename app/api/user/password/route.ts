@@ -5,7 +5,6 @@ import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import bcrypt from 'bcryptjs';
 import { createRateLimiter } from '@/lib/security';
-import { validatePassword } from '@/utils/password';
 
 const passwordUpdateLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 10 });
 
@@ -40,11 +39,6 @@ export async function PUT(request: Request) {
       if (newPassword !== confirmPassword) {
         return NextResponse.json({ error: 'Passwords do not match' }, { status: 400 });
       }
-      const passwordValidation = validatePassword(newPassword);
-      if (!passwordValidation.isValid) {
-        return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
-      }
-
       const hashedPassword = await bcrypt.hash(newPassword, 12);
       user.password = hashedPassword;
       await user.save();
@@ -63,11 +57,6 @@ export async function PUT(request: Request) {
 
     if (newPassword !== confirmPassword) {
       return NextResponse.json({ error: 'Passwords do not match' }, { status: 400 });
-    }
-
-    const passwordValidation = validatePassword(newPassword);
-    if (!passwordValidation.isValid) {
-      return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
     }
 
     // Verify current password

@@ -4,7 +4,6 @@ import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { hashToken } from '@/lib/token';
 import { createRateLimiter } from '@/lib/security';
-import { validatePassword } from '@/utils/password';
 
 const resetPasswordLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
@@ -21,11 +20,6 @@ export async function POST(request: NextRequest) {
 
     if (!token || !password) {
       return NextResponse.json({ error: 'Token and password are required' }, { status: 400 });
-    }
-
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid) {
-      return NextResponse.json({ error: passwordValidation.message }, { status: 400 });
     }
 
     await dbConnect();

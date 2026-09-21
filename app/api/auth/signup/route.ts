@@ -5,7 +5,6 @@ import User from '@/lib/db/models/User';
 import { generateSecureToken, hashToken } from '@/lib/token';
 import { sendVerificationEmail } from '@/lib/email';
 import { createRateLimiter, isValidEmail, normalizeEmail, sanitizeText } from '@/lib/security';
-import { validatePassword } from '@/utils/password';
 
 const signupLimiter = createRateLimiter({ windowMs: 60 * 60 * 1000, maxRequests: 5 });
 
@@ -30,14 +29,6 @@ export async function POST(request: NextRequest) {
 
     if (!isValidEmail(email)) {
       return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 });
-    }
-
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.isValid) {
-      return NextResponse.json(
-        { error: passwordValidation.message },
-        { status: 400 }
-      );
     }
 
     await dbConnect();
