@@ -469,14 +469,14 @@ NEXTAUTH_URL=http://localhost:3000
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-SMTP_HOST=
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=
-SMTP_PASS=
-SMTP_FROM=
+EMAIL_USER=
+EMAIL_PASS=
+EMAIL_FROM=
 ```
 
-The app will use local console preview links in development when SMTP is not configured.
+Keep local SMTP credentials in `.env.local`; `EMAIL_PASS` should be a Google App Password. The app reports only safe SMTP configuration metadata in development and does not log verification tokens. Check Gmail SMTP authentication with `npm run smtp:verify`.
 
 ### Install dependencies
 
