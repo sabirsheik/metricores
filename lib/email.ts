@@ -1,17 +1,32 @@
 import nodemailer from 'nodemailer';
 
 const smtpHost = process.env.SMTP_HOST;
-const smtpPort = parseInt(process.env.SMTP_PORT || '587');
-const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
-const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
-const smtpFrom = process.env.SMTP_FROM || process.env.EMAIL_FROM;
+const smtpPort = Number.parseInt(process.env.SMTP_PORT || '587', 10);
+const smtpUser = process.env.EMAIL_USER;
+const smtpPass = process.env.EMAIL_PASS;
+const smtpFrom = process.env.EMAIL_FROM;
+
+export const getSmtpConfigurationDiagnostics = () => ({
+  SMTP_HOST: smtpHost || '',
+  SMTP_PORT: smtpPort,
+  EMAIL_USER: smtpUser || '',
+  EMAIL_FROM: smtpFrom || '',
+  EMAIL_PASS_EXISTS: Boolean(smtpPass),
+  EMAIL_PASS_LENGTH: smtpPass?.length ?? 0,
+});
+
+if (process.env.NODE_ENV === 'development') {
+  console.info('[Email] SMTP configuration', getSmtpConfigurationDiagnostics());
+}
 
 const hasUsableSmtpConfig = Boolean(
   smtpHost &&
-  smtpHost !== 'smtp.example.com' &&
   smtpUser &&
   smtpPass &&
-  smtpFrom
+  smtpFrom &&
+  Number.isInteger(smtpPort) &&
+  smtpPort > 0 &&
+  smtpPort < 65536
 );
 
 const transporter = hasUsableSmtpConfig
@@ -26,18 +41,18 @@ const transporter = hasUsableSmtpConfig
     })
   : null;
 
-const sendEmail = async (to: string, subject: string, html: string, previewUrl: string) => {
+const sendEmail = async (to: string, subject: string, html: string) => {
   if (!transporter) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[Email] SMTP is not configured. Development link for ${to}: ${previewUrl}`);
+      console.warn('[Email] SMTP is not configured; verification email was not sent.');
       return;
     }
 
-    throw new Error('Email service is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, and SMTP_FROM.');
+    throw new Error('Email service is not configured. Set SMTP_HOST, SMTP_PORT, EMAIL_USER, EMAIL_PASS, and EMAIL_FROM.');
   }
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: smtpFrom,
       sender: smtpFrom,
       replyTo: smtpFrom,
@@ -51,14 +66,44 @@ const sendEmail = async (to: string, subject: string, html: string, previewUrl: 
         'Importance': 'Normal',
       },
     });
+
+    console.info('[Email] SMTP send result', {
+      acceptedRecipients: info.accepted.length,
+      rejectedRecipients: info.rejected.length,
+      responseCode: Number(info.response?.match(/^(\d{3})/)?.[1]) || undefined,
+    });
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[Email] SMTP delivery failed. Development link for ${to}: ${previewUrl}`);
+      const smtpError = error as Error & {
+        code?: string;
+        command?: string;
+        responseCode?: number;
+      };
+      let message = smtpError.message || String(error);
+      for (const secret of [smtpUser, smtpPass, smtpFrom, to]) {
+        if (secret) message = message.split(secret).join('[redacted]');
+      }
+
+      console.error('[Email] SMTP delivery failed', {
+        code: smtpError.code,
+        command: smtpError.command,
+        responseCode: smtpError.responseCode,
+        message: message.slice(0, 500),
+      });
+      console.warn('[Email] Verification email was not sent.');
       return;
     }
 
     throw error;
   }
+};
+
+export const verifySmtpConnection = async () => {
+  if (!transporter) {
+    throw new Error('SMTP configuration is incomplete; check the safe configuration diagnostic.');
+  }
+
+  await transporter.verify();
 };
 
 export const sendVerificationEmail = async (email: string, fullName: string, token: string) => {
@@ -178,7 +223,7 @@ export const sendVerificationEmail = async (email: string, fullName: string, tok
 </html>
   `;
   
-  await sendEmail(email, 'Verify your email - Metricores', html, verificationUrl);
+  await sendEmail(email, 'Verify your email - Metricores', html);
 };
 
 export const sendPasswordResetEmail = async (email: string, fullName: string, token: string) => {
@@ -297,5 +342,5 @@ export const sendPasswordResetEmail = async (email: string, fullName: string, to
 </html>
   `;
   
-  await sendEmail(email, 'Reset your password - Metricores', html, resetUrl);
+  await sendEmail(email, 'Reset your password - Metricores', html);
 };
