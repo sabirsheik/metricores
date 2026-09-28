@@ -36,20 +36,29 @@ const sendEmail = async (to: string, subject: string, html: string, previewUrl: 
     throw new Error('Email service is not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS, and SMTP_FROM.');
   }
 
-  await transporter.sendMail({
-    from: smtpFrom,
-    sender: smtpFrom,
-    replyTo: smtpFrom,
-    to,
-    subject,
-    html,
-    headers: {
-      'List-Unsubscribe': '<mailto:unsubscribe@metricores.com>',
-      'X-Priority': '3',
-      'X-MSMail-Priority': 'Normal',
-      'Importance': 'Normal',
-    },
-  });
+  try {
+    await transporter.sendMail({
+      from: smtpFrom,
+      sender: smtpFrom,
+      replyTo: smtpFrom,
+      to,
+      subject,
+      html,
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@metricores.com>',
+        'X-Priority': '3',
+        'X-MSMail-Priority': 'Normal',
+        'Importance': 'Normal',
+      },
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[Email] SMTP delivery failed. Development link for ${to}: ${previewUrl}`);
+      return;
+    }
+
+    throw error;
+  }
 };
 
 export const sendVerificationEmail = async (email: string, fullName: string, token: string) => {
