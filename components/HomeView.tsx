@@ -27,7 +27,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { calculatorsData } from '@/data/calculators';
-import { calcIcons } from './CalculatorView';
+import { calcIcons } from './calculator/calcIcons';
 import { guidesData } from '@/data/guides';
 
 interface HomeViewProps {
