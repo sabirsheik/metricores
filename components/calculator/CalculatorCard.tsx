@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { calcIcons } from './calcIcons';
 import {
   ArrowLeft,
   Percent,
@@ -52,26 +53,6 @@ import { formatCurrency, formatPercentage, formatNumber, formatDate } from '@/ut
 import { compareCivilDates, getTodayDateString, parseCivilDate } from '@/utils/age';
 import { calculateReverseMortgage } from '@/utils/reverseMortgage';
 import ScientificCalculator from './ScientificCalculator';
-
-// Icon mapping for calculators
-export const calcIcons: Record<string, any> = {
-  scientific: Calculator,
-  graphing: TrendingUp,
-  mortgage: HomeIcon,
-  'reverse-mortgage': HomeIcon,
-  loan: Percent,
-  tax: FileText,
-  interest: TrendingUp,
-  payment: CreditCard,
-  time: Clock,
-  age: Calendar,
-  'profit-margin': Scale,
-  roi: Award,
-  percentage: Percent,
-  discount: Tag,
-  tip: Coins,
-  vat: Receipt
-};
 
 interface CalculatorCardProps {
   calculator: CalculatorSchema;
