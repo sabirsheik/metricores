@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Search, X, CornerDownLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { calculatorsData } from '@/data/calculators';
-import { calcIcons } from './CalculatorView';
+import { calcIcons } from './calculator/calcIcons';
 
 interface SearchModalProps {
   isOpen: boolean;
