@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Zap, ArrowUpRight, Calculator, Landmark, BriefcaseBusiness, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
 import { calculatorsData } from '@/data/calculators';
-import { calcIcons } from './CalculatorView';
+import { calcIcons } from './calculator/calcIcons';
 
 interface CalculatorsDirectoryProps {
   onSelectCalculator: (id: string) => void;
