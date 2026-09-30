@@ -1,5 +1,6 @@
 import { CalculatorSchema } from '@/types';
-import CalculatorCard, { calcIcons } from './calculator/CalculatorCard';
+import CalculatorCard from './calculator/CalculatorCard';
+import { calcIcons } from './calculator/calcIcons';
 
 // Re-export calcIcons for backward compatibility with other files (HomeView, CalculatorsDirectory)
 export { calcIcons };
